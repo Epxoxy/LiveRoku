@@ -73,9 +73,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="helpers\Constant.cs" />
-    <Compile Include="helpers\debug\DebugHelper.cs" />
+    <Compile Include="helpers\debugex\DebugHelper.cs" />
     <Compile Include="helpers\IAssemblyCaches.cs" />
-    <Compile Include="helpers\debug\LogTraceListener.cs" />
+    <Compile Include="helpers\debugex\LogTraceListener.cs" />
     <Compile Include="storage\FileHelper.cs" />
     <Compile Include="storage\SerializeHelper.cs" />
     <Compile Include="storage\StorageHelper.cs" />
