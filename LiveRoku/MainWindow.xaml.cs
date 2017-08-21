@@ -77,15 +77,16 @@ namespace LiveRoku {
             this.Loaded -= onLoaded;
             coreLoaded = false;
             object instance = null;
-            var types = PluginLoader.LoadImpl<ILiveDownloader> (App.coreDllPath, App.instance);
+            var types = PluginLoader.LoadTypesListImpl<ILiveDownloader> (App.coreFolder, App.instance);
             if (types == null || types.Count () <= 0 ||
                 (instance = Activator.CreateInstance (types.First (), this, "")) == null ||
                 (downloader = instance as ILiveDownloader) == null) {
-                System.Threading.Tasks.Task.Run (() => { MessageBox.Show ("Load core dll fail.", "Error"); });
+                string msg = types == null ? "Core dll not exist." : "Load core dll fail.";
+                System.Threading.Tasks.Task.Run (() => { MessageBox.Show (msg, "Error"); });
                 return;
             }
             coreLoaded = true;
-            plugins = PluginLoader.LoadAll<IPlugin> (App.pluginFolder, App.instance);
+            plugins = PluginLoader.LoadInstances<IPlugin> (App.pluginFolder, App.instance);
             storage = Storage.StorageHelper.instance (App.dataFolder);
             plugins.ForEach (p => p.onInitialize (storage));
             stoppedSymbol = FindResource (Constant.PauseSymbolKey) as UIElement;

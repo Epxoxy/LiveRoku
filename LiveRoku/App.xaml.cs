@@ -15,7 +15,7 @@ namespace LiveRoku {
         public static readonly string baseFolder = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string dataFolder = baseFolder + "data";
         public static readonly string pluginFolder = baseFolder + "plugins";
-        public static readonly string coreDllPath = pluginFolder + "//LiveRoku.Core.dll";
+        public static readonly string coreFolder = baseFolder + "core";
         private static readonly string debugPath = baseFolder + "debug.txt";
         private Dictionary<string, Assembly> assemblyCache;
         private LogTraceListener logTracker;

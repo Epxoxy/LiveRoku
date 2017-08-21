@@ -27,7 +27,7 @@ namespace LiveRoku
             if (debugMsgBuilder.Length <= 0) return;
             try {
                 Storage.FileHelper.writeTxt (debugMsgBuilder.ToString (), path, true);
-            } catch (Exception e) { }
+            } catch (Exception) { throw; }
             debugMsgBuilder.Clear ();
         }
 
