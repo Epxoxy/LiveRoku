@@ -1,0 +1,73 @@
+﻿<Window x:Class="LiveRoku.UI.MessageDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LiveRoku.UI"
+        mc:Ignorable="d"
+        ShowInTaskbar="False"
+        Background="White"
+        BorderThickness="0"
+        BorderBrush="White"
+        Title="MessageDialog" 
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual"
+        MinWidth="450" MinHeight="150" 
+        MaxWidth="800" MaxHeight="600">
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="1" CaptionHeight="0"/>
+    </WindowChrome.WindowChrome>
+    <Window.Template>
+        <ControlTemplate TargetType="{x:Type local:MessageDialog}">
+            <Grid x:Name="PART_TemplateRoot">
+                <Rectangle x:Name="PART_Border" Fill="{TemplateBinding Background}" 
+                           StrokeThickness="{TemplateBinding StrokeThickness}"
+                           SnapsToDevicePixels="True">
+                    <Rectangle.Stroke>
+                        <SolidColorBrush Color="{x:Static SystemParameters.WindowGlassColor}"/>
+                    </Rectangle.Stroke>
+                </Rectangle>
+                <Grid Margin="7,0,7,7">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="36"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="20"/>
+                        </Grid.ColumnDefinitions>
+                        <Label x:Name="PART_Title" Content="{TemplateBinding TypeTitle}" IsHitTestVisible="False"/>
+                        <Button x:Name="PART_CloseButton" Grid.Column="1" BorderThickness="0" Background="Transparent"
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Template="{StaticResource DeleteButtonTemplateKey}" Visibility="{TemplateBinding CloseButtonVisibility}"/>
+                    </Grid>
+                    <Grid Grid.Row="1" Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock FontSize="20" Text="{TemplateBinding Title}" IsHitTestVisible="False"/>
+                        <ContentPresenter x:Name="PART_Content" Grid.Row="1" TextElement.FontSize="16" Margin="0,10">
+                            <ContentPresenter.Resources>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,0,0,6">
+                        <Button x:Name="PART_PrimaryButton" Content="{TemplateBinding PrimaryButtonText}" Width="90" Margin="12,0" Style="{StaticResource WinTenBtnStyle}"/>
+                        <Button x:Name="PART_SecondaryButton" Content="{TemplateBinding SecondaryButtonText}" Width="90" Style="{StaticResource WinTenBtnStyle}"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="CloseButtonVisibility" Value="Visible">
+                    <Setter Property="Grid.ColumnSpan" TargetName="PART_Title" Value="2" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Window.Template>
+</Window>

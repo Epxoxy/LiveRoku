@@ -1,0 +1,254 @@
+﻿<Window x:Class="LiveRoku.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:LiveRoku.UI.converters"
+        xmlns:controls="clr-namespace:LiveRoku.UI.controls"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:LiveRoku"
+        mc:Ignorable="d"
+        Icon="appicon.ico"
+        Title="LiveRoku"
+        MinHeight="430" MinWidth="300"
+        Width="300" Height="430">
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="bool2visible" NotVisibleValue="Hidden" InvertVisibility="False"/>
+        <converters:BoolToVisibilityConverter x:Key="bool2collapsed" NotVisibleValue="Collapsed" InvertVisibility="True"/>
+        <converters:BoolSelectorConverter x:Key="bool2column" TrueValue="0" FalseValue="1"/>
+        <converters:BoolSelectorConverter x:Key="bool2columnspan" TrueValue="2" FalseValue="1"/>
+    </Window.Resources>
+    <Grid>
+        <controls:DelayFitSizePane x:Name="root">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="ToWide">
+                    <ei:ChangePropertyAction TargetObject="{Binding ElementName=outputEx}" PropertyName="IsExpanded" Value="False" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Grid x:Name="layer">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <Grid Grid.Column="1" Background="#FFF6F6F6">
+                    <DockPanel Margin="6,0,6,6">
+                        <Grid DockPanel.Dock="Top" TextElement.FontSize="16" >
+                            <TextBlock Text="Output" Padding="4,10" Margin="0,0,0,2" Foreground="DimGray"/>
+                            <Button Content="Clear" Padding="20,0" Style="{StaticResource TransparentToGrayButtonStyle}" HorizontalAlignment="Right"
+                                    local:TextBoxHelper.ClearTarget="{Binding ElementName=debugView}"
+                                    local:TextBoxHelper.IsClearButton="True"/>
+                        </Grid>
+                        <ContentControl Template="{StaticResource ShadowControl}">
+                            <TextBox x:Name="debugView" Style="{StaticResource OutputBox}" controls:PlaceHolder.Content="Output text block" />
+                        </ContentControl>
+                    </DockPanel>
+                </Grid>
+
+
+                <Grid Grid.ColumnSpan="{Binding IsNarrow, ElementName=root,Converter={StaticResource bool2columnspan}}"
+                   Background="#FFF6F6F6">
+                    <ItemsControl Padding="12,0">
+                        <!--Task control-->
+                        <TextBlock Text="Task" Foreground="DimGray" FontSize="16" Margin="2,7,0,3"/>
+                        <ContentControl MinHeight="200" Template="{StaticResource ShadowControl}"
+                            Margin="0,4">
+                            <Border>
+                                <Grid>
+                                    <ItemsControl Padding="8">
+                                        <ItemsControl x:Name="paramsElements">
+                                            <HeaderedContentControl Margin="7,0" Padding="0,10" Style="{StaticResource UnderLineInput}">
+                                                <HeaderedContentControl.Header>
+                                                    <TextBlock FontSize="16" Margin="0,0,7,0"><Run Text="RoomId"/></TextBlock>
+                                                </HeaderedContentControl.Header>
+                                                <!--Attach room id change event-->
+                                                <TextBox x:Name="roomIdTBox" controls:PlaceHolder.Content="http://live.bilibili.com/{number}" Margin="0,4,0,0" Style="{StaticResource FixPlaceHolderTextBox}" />
+                                            </HeaderedContentControl>
+                                            <HeaderedContentControl Margin="7,0,7,7" Padding="0,10" Style="{StaticResource UnderLineInput}">
+                                                <HeaderedContentControl.Header>
+                                                    <!--Attach save path label mouseleftdown event-->
+                                                    <TextBlock x:Name="savepathTextLabel" Text="Location" FontSize="16" Margin="0,0,7,0" Cursor="Hand"/>
+                                                </HeaderedContentControl.Header>
+                                                <Grid Margin="0,4,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <!--Attach save path box text change event-->
+                                                    <TextBox x:Name="locationTBox" controls:PlaceHolder.Content="file address here" Style="{StaticResource FixPlaceHolderTextBox}" IsReadOnly="True"
+                                                 ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                                                    <!--Attach open save path configu button click event-->
+                                                    <Button x:Name="openSavepathConfigDialogButton" Grid.Column="1" Template="{StaticResource BtnLiteTemplate}">
+                                                        <Grid Margin="7,0">
+                                                            <Path ClipToBounds="True" Data="M0,0 M2,2 M0,1 L2,1z M1,0 L1,2z" StrokeThickness="2" Stretch="Fill" Stroke="#3399ff" Height="15" Width="15">
+                                                                <Path.CacheMode>
+                                                                    <BitmapCache SnapsToDevicePixels="True" />
+                                                                </Path.CacheMode>
+                                                            </Path>
+                                                        </Grid>
+                                                    </Button>
+                                                </Grid>
+                                            </HeaderedContentControl>
+                                            <!--Attach options danmaku check box event-->
+                                            <CheckBox x:Name="saveCommentBox" Margin="6" Style="{StaticResource AnimatedCheckBox}" IsChecked="True">
+                                                <TextBlock Text="save danmaku" Margin="10,0,0,0" Foreground="Gray"/>
+                                            </CheckBox>
+                                            <!--Attach options autostart check box event-->
+                                            <CheckBox x:Name="autoStartBox" Margin="6" Style="{StaticResource AnimatedCheckBox}" IsChecked="True">
+                                                <TextBlock Text="auto start on streaming" Margin="10,0,0,0" Foreground="Gray"/>
+                                            </CheckBox>
+                                            <!--Attach start button event-->
+                                        </ItemsControl>
+                                        <Button x:Name="startEndBtn01" Style="{StaticResource BlueButtonStyle}" Height="40" Margin="4,7" FontSize="18" Content="Start"/>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
+                        </ContentControl>
+                        <!--Status view-->
+                        <TextBlock Text="Status" Foreground="DimGray" FontSize="16" Margin="2,7,0,3"/>
+                        <ContentControl Margin="0,8" Template="{StaticResource ShadowControl}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Expander Padding="4,0" Background="#ffe6cc" Style="{StaticResource SimpleAnimateExpanderStyle}" ExpandDirection="Up"
+                                       IsExpanded="{Binding IsExpanded, ElementName=statusEx}">
+                                    <Expander.Header>
+                                        <Grid Margin="30,0,0,0">
+                                            <Rectangle Fill="#ffe6cc" Height="48"/>
+                                            <Label x:Name="liveStatusView" Content="Waiting" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Gray"/>
+                                            <ProgressBar x:Name="RecordStatusGroupBox" 
+                                             BorderThickness="0"
+                                             Height="1" VerticalAlignment="Top" IsIndeterminate="False"
+                                             Visibility="{Binding IsIndeterminate, Converter={StaticResource bool2visible}, RelativeSource={RelativeSource Self}}"/>
+                                        </Grid>
+                                    </Expander.Header>
+                                </Expander>
+                            </Grid>
+                        </ContentControl>
+                    </ItemsControl>
+
+                    <!--Bottom tool-->
+                    <Label x:Name="aboutLinkLabel" Margin="12,6" Content="About LiveRoku" 
+                           Foreground="#FF0066CC" HorizontalAlignment="Left" Height="25" VerticalAlignment="Bottom" Cursor="Hand"/>
+
+                    <Button Command="{x:Static controls:ExpendEx.ChangeExpandedCommand}"
+                    CommandTarget="{Binding ElementName=outputEx}"
+                    Template="{StaticResource BtnLiteTemplate}"
+                    Content="Output" Foreground="#FF0066CC"
+                    Cursor="Hand"
+                    HorizontalAlignment="Right" Margin="14,8"
+                    Visibility="{Binding IsNarrow, ElementName=root,Converter={StaticResource bool2visible}}"
+                    VerticalAlignment="Bottom"/>
+
+                    <!--Expend status info-->
+                    <controls:ExpendEx x:Name="statusEx" VerticalAlignment="Center">
+                        <Grid Height="{Binding ActualHeight, ElementName=root}">
+                            <ContentControl Margin="10,0" Template="{StaticResource ShadowControl}">
+                                <Grid Background="White">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition Height="48"/>
+                                    </Grid.RowDefinitions>
+                                    <ItemsControl Padding="0,4">
+                                        <ItemsControl.Resources>
+                                            <Style x:Key="Header" TargetType="TextBlock">
+                                                <Setter Property="FontSize" Value="16" />
+                                                <Setter Property="TextAlignment" Value="Left" />
+                                                <Setter Property="Margin" Value="4" />
+                                                <Setter Property="Width" Value="90" />
+                                            </Style>
+                                            <Style x:Key="Content" TargetType="Label">
+                                                <Setter Property="Margin" Value="12,3,0,0" />
+                                                <Setter Property="Foreground" Value="Gray" />
+                                                <Setter Property="FontSize" Value="14" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                            <Style TargetType="HeaderedContentControl">
+                                                <Setter Property="Template" Value="{StaticResource HorizontalArrange}" />
+                                                <Setter Property="Margin" Value="10,4" />
+                                            </Style>
+                                        </ItemsControl.Resources>
+                                        <Button Command="{x:Static controls:ExpendEx.ChangeExpandedCommand}"
+                                    CommandTarget="{Binding ElementName=statusEx}"
+                                    Style="{StaticResource TransparentToGrayButtonStyle}" 
+                                    Padding="10" Margin="0,0,0,16" HorizontalContentAlignment="Left">
+                                            <StackPanel Orientation="Horizontal" Background="Transparent">
+                                                <ContentControl ContentTemplate="{StaticResource BackArrow}"/>
+                                                <TextBlock Text="Status" Foreground="DimGray" FontSize="16" Margin="10,0"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <HeaderedContentControl >
+                                            <HeaderedContentControl.Header>
+                                                <TextBlock Text="Time" Style="{StaticResource Header}"/>
+                                            </HeaderedContentControl.Header>
+                                            <Label x:Name="recordTimeView" Style="{StaticResource Content}" Content="00:00:00"/>
+                                        </HeaderedContentControl>
+                                        <Rectangle Style="{StaticResource Line}" />
+                                        <HeaderedContentControl >
+                                            <HeaderedContentControl.Header>
+                                                <TextBlock Text="Bit rate" Style="{StaticResource Header}"/>
+                                            </HeaderedContentControl.Header>
+                                            <Label  x:Name="bitRateView" Style="{StaticResource Content}" Content="0000.00 kbps"/>
+                                        </HeaderedContentControl>
+                                        <Rectangle Style="{StaticResource Line}" />
+                                        <HeaderedContentControl >
+                                            <HeaderedContentControl.Header>
+                                                <TextBlock Text="Size" Style="{StaticResource Header}"/>
+                                            </HeaderedContentControl.Header>
+                                            <Label x:Name="sizeView" Style="{StaticResource Content}" Content="0000.00 byte"/>
+                                        </HeaderedContentControl>
+                                        <Rectangle Style="{StaticResource Line}" />
+                                        <HeaderedContentControl >
+                                            <HeaderedContentControl.Header>
+                                                <TextBlock Text="Members" Style="{StaticResource Header}"/>
+                                            </HeaderedContentControl.Header>
+                                            <Label x:Name="userCountView" Style="{StaticResource Content}" Content="0"/>
+                                        </HeaderedContentControl>
+                                    </ItemsControl>
+                                    <Rectangle Grid.Row="1" Fill="#ffe6cc" Height="48"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding Content, ElementName=liveStatusView}"
+                                               Style="{StaticResource AlignCenter}" FontSize="14" Foreground="Gray"/>
+                                    <Button x:Name="startEndBtn02" Height="48" Width="48" Background="#ffab91" Style="{StaticResource ShadowCircleBtnStyle02}" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                            Margin="10,24" Grid.RowSpan="2" Foreground="White" Content="{StaticResource {x:Static local:Constant.PauseSymbolKey}}" />
+                                </Grid>
+                            </ContentControl>
+                        </Grid>
+                    </controls:ExpendEx>
+
+                    <!--Expend output info-->
+                    <controls:ExpendEx x:Name="outputEx" VerticalAlignment="Center">
+                        <ContentControl Margin="10,0" Template="{StaticResource ShadowControl}">
+                            <Grid Height="{Binding ActualHeight, ElementName=root}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Button Command="{x:Static controls:ExpendEx.ChangeExpandedCommand}"
+                                    CommandTarget="{Binding ElementName=outputEx}"
+                                    Style="{StaticResource TransparentToGrayButtonStyle}" 
+                                    Padding="10" HorizontalContentAlignment="Left">
+                                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                                        <ContentControl ContentTemplate="{StaticResource BackArrow}"/>
+                                        <TextBlock Text="Output" Foreground="DimGray" FontSize="16" Margin="10,0"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Padding="10,0" Content="Clear" Style="{StaticResource TransparentToGrayButtonStyle}" HorizontalAlignment="Right" 
+                                        local:TextBoxHelper.IsClearButton="True"
+                                        local:TextBoxHelper.ClearTarget="{Binding ElementName=debugView}"/>
+                                <TextBox Grid.Row="1" Margin="0,16,0,0" Text="{Binding Text, ElementName=debugView}" Style="{StaticResource OutputBox}" />
+                            </Grid>
+                        </ContentControl>
+                    </controls:ExpendEx>
+
+                </Grid>
+
+            </Grid>
+        </controls:DelayFitSizePane>
+    </Grid>
+</Window>

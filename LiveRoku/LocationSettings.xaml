@@ -1,0 +1,57 @@
+﻿<Window x:Class="LiveRoku.LocationSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LiveRoku"
+        xmlns:controls="clr-namespace:LiveRoku.UI.controls"
+        xmlns:props="clr-namespace:LiveRoku.Properties"
+        mc:Ignorable="d"
+        ShowInTaskbar="False"
+        Background="White"
+        BorderThickness="0"
+        BorderBrush="White"
+        Title="SaveDialog" 
+        ResizeMode="NoResize"
+        Width="450" Height="320">
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="1" CaptionHeight="0"/>
+    </WindowChrome.WindowChrome>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition />
+            <RowDefinition Height="48" />
+        </Grid.RowDefinitions>
+        <Rectangle MouseDown="onDragMoveMouseDown">
+            <Rectangle.Fill>
+                <SolidColorBrush Opacity="0.75" Color="{x:Static SystemParameters.WindowGlassColor}"/>
+            </Rectangle.Fill>
+        </Rectangle>
+        <TextBlock Text="Downloads" FontSize="20" Foreground="White" IsHitTestVisible="False" Style="{StaticResource AlignCenter}"/>
+        <ItemsControl Grid.Row="1">
+            <StackPanel Margin="10,7">
+                <TextBlock Text="Location" FontSize="13"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="folderTBox" x:FieldModifier="private" Style="{StaticResource FixPlaceHolderTextBox}" Foreground="DarkSlateGray" controls:PlaceHolder.Content="Path save the video file" Padding="0,7"/>
+                    <Button Grid.Column="1" Click="changeBtnClick" Content="CHANGE" Padding="10,0" Style="{StaticResource WinTenBtnStyle}"/>
+                </Grid>
+            </StackPanel>
+            <Rectangle Style="{StaticResource Line}"/>
+            <StackPanel Margin="10,7">
+                <TextBlock Text="File name" FontSize="13"/>
+                <TextBox x:Name="fileNameTBox" x:FieldModifier="private" Foreground="DarkSlateGray" Style="{StaticResource FixPlaceHolderTextBox}" controls:PlaceHolder.Content="Video file name" Padding="0,7"/>
+            </StackPanel>
+            <Rectangle Style="{StaticResource Line}"/>
+            <TextBlock Margin="10" Text="{x:Static props:Resources.FileFormatExplain}" FontSize="13" Foreground="DimGray" TextWrapping="Wrap"/>
+        </ItemsControl>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
+            <Button Content="SURE" FontSize="20" Width="100" Margin="10,0" Style="{StaticResource TransparentToGrayButtonStyle}" Click="okBtnClick"/>
+            <Button Content="CANCEL" FontSize="20" Width="100" Margin="10,0,0,0" Style="{StaticResource TransparentToGrayButtonStyle}" Click="cancelBtnClick"/>
+        </StackPanel>
+    </Grid>
+</Window>
