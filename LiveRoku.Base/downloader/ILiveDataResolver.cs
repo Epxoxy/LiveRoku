@@ -4,6 +4,6 @@
         void onDurationUpdate (long duration, string timeText);
         void onDownloadSizeUpdate (long totalSize, string sizeText);
         void onBitRateUpdate (long bitRate, string bitRateText);
-        void onOnlineCountUpdate (long onlineCount);
+        void onHotUpdate (long popularity);
     }
 }

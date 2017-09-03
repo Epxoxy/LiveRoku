@@ -259,9 +259,9 @@ namespace LiveRoku {
             Dispatcher.invokeSafely (() => { bitRateView.Content = bitRateText; });
         }
 
-        public void onOnlineCountUpdate (long onlineCount) {
-            Dispatcher.invokeSafely (() => { userCountView.Content = onlineCount; });
-            System.Diagnostics.Debug.WriteLine ("Updated : Online -> " + onlineCount);
+        public void onHotUpdate (long popularity) {
+            Dispatcher.invokeSafely (() => { userCountView.Content = popularity; });
+            System.Diagnostics.Debug.WriteLine ("Updated : Hot -> " + popularity);
         }
 
         #endregion ---------------------------------------------
