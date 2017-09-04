@@ -23,7 +23,7 @@ namespace LiveRoku {
         private TextBox roomIdBox => roomIdTBox;
         private CheckBox saveDanmaku => saveCommentBox;
         private CheckBox autoStart => autoStartBox;
-        private TextBox locationBox => locationTBox;
+        private TextBlock locationBox => locationTBox;
 
         //--------------------------------------
         //PART B : UIElement for extend function
@@ -66,7 +66,6 @@ namespace LiveRoku {
         private MySettings settings;
         private IStorage storage;
         private List<IPlugin> plugins;
-        private bool coreLoaded;
 
         public MainWindow () {
             InitializeComponent ();
@@ -75,45 +74,47 @@ namespace LiveRoku {
 
         private void onLoaded (object sender, RoutedEventArgs e) {
             this.Loaded -= onLoaded;
-            coreLoaded = false;
+            //Load basic resources
+            stoppedSymbol = FindResource(Constant.PauseSymbolKey) as UIElement;
+            startedSymbol = FindResource(Constant.RightSymbolKey) as UIElement;
+            waitingSymbol = FindResource(Constant.LoadingSymbolKey) as UIElement;
+            //Load core dll
             object instance = null;
+            var coreDllLoaded = false;
             var types = PluginLoader.LoadTypesListImpl<ILiveDownloader> (App.coreFolder, App.instance);
             if (types == null || types.Count () <= 0 ||
                 (instance = Activator.CreateInstance (types.First (), this, "")) == null ||
                 (downloader = instance as ILiveDownloader) == null) {
                 string msg = types == null ? "Core dll not exist." : "Load core dll fail.";
                 System.Threading.Tasks.Task.Run (() => { MessageBox.Show (msg, "Error"); });
-                return;
+            }else coreDllLoaded = true;
+            //Subscribe basic events
+            purgeEvents(resubscribe: true, justBasicEvent: !coreDllLoaded);
+            //Get settings
+            storage = Storage.StorageHelper.instance(App.dataFolder);
+            findSettings();
+            if (coreDllLoaded) {
+                //Load plugins
+                plugins = PluginLoader.LoadInstances<IPlugin>(App.pluginFolder, App.instance);
+                plugins.ForEach(p => p.onInitialize(storage));
+                //Generate helpers
+                //downloader = new LiveDownloader(this, "");
+                downloader.LiveDataResolvers.add(this);
+                downloader.StatusBinders.add(this);
+                downloader.Loggers.add(this);
+                plugins.ForEach(p => p.onAttach(downloader));
             }
-            coreLoaded = true;
-            plugins = PluginLoader.LoadInstances<IPlugin> (App.pluginFolder, App.instance);
-            storage = Storage.StorageHelper.instance (App.dataFolder);
-            plugins.ForEach (p => p.onInitialize (storage));
-            stoppedSymbol = FindResource (Constant.PauseSymbolKey) as UIElement;
-            startedSymbol = FindResource (Constant.RightSymbolKey) as UIElement;
-            waitingSymbol = FindResource (Constant.LoadingSymbolKey) as UIElement;
-            //Subscribe events
-            purgeEvents (resubscribe : true);
-            initSettings ();
-            //Generate helpers
-            //downloader = new LiveDownloader(this, "");
-            downloader.LiveDataResolvers.add (this);
-            downloader.StatusBinders.add (this);
-            downloader.Loggers.add (this);
-            plugins.ForEach (p => p.onAttach (downloader));
         }
 
         protected override void OnClosing (CancelEventArgs e) {
-            if (coreLoaded) {
-                purgeEvents ();
-                downloader.stop ();
-                plugins.ForEach (p => p.onDetach ());
-                saveSettings ();
-            }
+            purgeEvents ();
+            downloader?.stop();
+            plugins?.ForEach(p => p.onDetach());
+            saveSettings();
             base.OnClosing (e);
         }
 
-        private void initSettings () {
+        private void findSettings () {
             //Load settings
             if (!storage.tryGet<MySettings> ("settings", out settings)) {
                 settings = new MySettings ();
@@ -125,6 +126,7 @@ namespace LiveRoku {
         }
 
         private void saveSettings () {
+            if (settings == null || storage == null) return;
             int roomId = 0;
             if (int.TryParse (RoomId, out roomId)) {
                 settings.addLastRoomId (roomId);
@@ -138,7 +140,7 @@ namespace LiveRoku {
         //Part for controlling progress
         //Subscribe function like start, about,set/explore location
         #region -------------- event handlers --------------
-        private void purgeEvents (bool resubscribe = false) {
+        private void purgeEvents (bool resubscribe = false, bool justBasicEvent = false) {
             exploreFolder.MouseLeftButtonUp -= explore;
             aboutLink.MouseLeftButtonUp -= showAbout;
             editPathBtn.Click -= setLocation;
@@ -148,8 +150,10 @@ namespace LiveRoku {
                 exploreFolder.MouseLeftButtonUp += explore;
                 aboutLink.MouseLeftButtonUp += showAbout;
                 editPathBtn.Click += setLocation;
-                ctlBtn01.Click += startOrStop;
-                ctlBtn02.Click += startOrStop;
+                if (!justBasicEvent) {
+                    ctlBtn01.Click += startOrStop;
+                    ctlBtn02.Click += startOrStop;
+                }
             }
         }
 

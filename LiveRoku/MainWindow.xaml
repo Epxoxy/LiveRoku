@@ -60,17 +60,26 @@
                                 <Grid>
                                     <ItemsControl Padding="8">
                                         <ItemsControl x:Name="paramsElements">
+                                            <ItemsControl.Style>
+                                                <Style TargetType="FrameworkElement">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsEnabled" Value="False">
+                                                            <Setter Property="Opacity" Value="0.6" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ItemsControl.Style>
                                             <HeaderedContentControl Margin="7,0" Padding="0,10" Style="{StaticResource UnderLineInput}">
                                                 <HeaderedContentControl.Header>
-                                                    <TextBlock FontSize="16" Margin="0,0,7,0"><Run Text="RoomId"/></TextBlock>
+                                                    <TextBlock FontSize="16" Margin="0,0,0,0"><Run Text="RoomId"/></TextBlock>
                                                 </HeaderedContentControl.Header>
                                                 <!--Attach room id change event-->
-                                                <TextBox x:Name="roomIdTBox" controls:PlaceHolder.Content="http://live.bilibili.com/{number}" Margin="0,4,0,0" Style="{StaticResource FixPlaceHolderTextBox}" />
+                                                <TextBox x:Name="roomIdTBox" Padding="7,0,4,0" controls:PlaceHolder.Content="http://live.bilibili.com/{number}" Margin="0,4,0,0" Style="{StaticResource FixPlaceHolderTextBox}" />
                                             </HeaderedContentControl>
                                             <HeaderedContentControl Margin="7,0,7,7" Padding="0,10" Style="{StaticResource UnderLineInput}">
                                                 <HeaderedContentControl.Header>
                                                     <!--Attach save path label mouseleftdown event-->
-                                                    <TextBlock x:Name="savepathTextLabel" Text="Location" FontSize="16" Margin="0,0,7,0" Cursor="Hand"/>
+                                                    <TextBlock x:Name="savepathTextLabel" Text="Location" FontSize="16" Cursor="Hand"/>
                                                 </HeaderedContentControl.Header>
                                                 <Grid Margin="0,4,0,0">
                                                     <Grid.ColumnDefinitions>
@@ -78,12 +87,15 @@
                                                         <ColumnDefinition Width="auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <!--Attach save path box text change event-->
-                                                    <TextBox x:Name="locationTBox" controls:PlaceHolder.Content="file address here" Style="{StaticResource FixPlaceHolderTextBox}" IsReadOnly="True"
-                                                 ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                                                    <TextBlock x:Name="locationTBox" Padding="7,0,4,0" TextTrimming="CharacterEllipsis"
+                                                               ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
                                                     <!--Attach open save path configu button click event-->
-                                                    <Button x:Name="openSavepathConfigDialogButton" Grid.Column="1" Template="{StaticResource BtnLiteTemplate}">
-                                                        <Grid Margin="7,0">
-                                                            <Path ClipToBounds="True" Data="M0,0 M2,2 M0,1 L2,1z M1,0 L1,2z" StrokeThickness="2" Stretch="Fill" Stroke="#3399ff" Height="15" Width="15">
+                                                    <Button x:Name="openSavepathConfigDialogButton" Grid.Column="1" Cursor="Hand" Template="{StaticResource BtnLiteTemplate}">
+                                                        <Grid Margin="2,0" Background="Transparent">
+                                                            <Path Data="M100,45 L100,85 A6,6 0 0 1 95,90 L5,90 A5,5 0 0 1 0,85 L0,5 A5,5 0 0 1 5,0 L55,0 M104,-4 L45,55" StrokeThickness="2" 
+                                                                  Stroke="#3399ff" Stretch="Fill" 
+                                                                  StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"
+                                                                  ClipToBounds="True" Height="15" Width="15">
                                                                 <Path.CacheMode>
                                                                     <BitmapCache SnapsToDevicePixels="True" />
                                                                 </Path.CacheMode>
