@@ -35,10 +35,10 @@
 
 
                 <Grid Grid.Column="1" Background="#FFF6F6F6">
-                    <DockPanel Margin="6,0,6,6">
+                    <DockPanel Margin="6,0,6,6" Focusable="False">
                         <Grid DockPanel.Dock="Top" TextElement.FontSize="16" >
                             <TextBlock Text="Output" Padding="4,10" Margin="0,0,0,2" Foreground="DimGray"/>
-                            <Button Content="Clear" Padding="20,0" Style="{StaticResource TransparentToGrayButtonStyle}" HorizontalAlignment="Right"
+                            <Button Content="Clear" FocusVisualStyle="{x:Null}" Padding="20,0" Style="{StaticResource TransparentToGrayButtonStyle}" HorizontalAlignment="Right"
                                     local:TextBoxHelper.ClearTarget="{Binding ElementName=debugView}"
                                     local:TextBoxHelper.IsClearButton="True"/>
                         </Grid>
@@ -58,7 +58,7 @@
                             Margin="0,4">
                             <Border>
                                 <Grid>
-                                    <ItemsControl Padding="8">
+                                    <ItemsControl Padding="8" Focusable="False">
                                         <ItemsControl x:Name="paramsElements">
                                             <ItemsControl.Style>
                                                 <Style TargetType="FrameworkElement">
@@ -133,7 +133,7 @@
                                     <Expander.Header>
                                         <Grid Margin="30,0,0,0">
                                             <Rectangle Fill="#ffe6cc" Height="48"/>
-                                            <Label x:Name="liveStatusView" Content="Waiting" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Gray"/>
+                                            <Label x:Name="statusOfLiveView" Content="Waiting" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Gray"/>
                                             <ProgressBar x:Name="RecordStatusGroupBox" 
                                              BorderThickness="0"
                                              Height="1" VerticalAlignment="Top" IsIndeterminate="False"
@@ -174,6 +174,7 @@
                                                 <Setter Property="TextAlignment" Value="Left" />
                                                 <Setter Property="Margin" Value="4" />
                                                 <Setter Property="Width" Value="90" />
+                                                <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
                                             </Style>
                                             <Style x:Key="Content" TargetType="Label">
                                                 <Setter Property="Margin" Value="12,3,0,0" />
@@ -184,6 +185,7 @@
                                             <Style TargetType="HeaderedContentControl">
                                                 <Setter Property="Template" Value="{StaticResource HorizontalArrange}" />
                                                 <Setter Property="Margin" Value="10,4" />
+                                                <Setter Property="IsTabStop" Value="False" />
                                             </Style>
                                         </ItemsControl.Resources>
                                         <Button Command="{x:Static controls:ExpendEx.ChangeExpandedCommand}"
@@ -191,7 +193,7 @@
                                     Style="{StaticResource TransparentToGrayButtonStyle}" 
                                     Padding="10" Margin="0,0,0,16" HorizontalContentAlignment="Left">
                                             <StackPanel Orientation="Horizontal" Background="Transparent">
-                                                <ContentControl ContentTemplate="{StaticResource BackArrow}"/>
+                                                <ContentControl ContentTemplate="{StaticResource BackArrow}" KeyboardNavigation.IsTabStop="False"/>
                                                 <TextBlock Text="Status" Foreground="DimGray" FontSize="16" Margin="10,0"/>
                                             </StackPanel>
                                         </Button>
@@ -218,13 +220,13 @@
                                         <Rectangle Style="{StaticResource Line}" />
                                         <HeaderedContentControl >
                                             <HeaderedContentControl.Header>
-                                                <TextBlock Text="Members" Style="{StaticResource Header}"/>
+                                                <TextBlock Text="Hot" Style="{StaticResource Header}"/>
                                             </HeaderedContentControl.Header>
-                                            <Label x:Name="userCountView" Style="{StaticResource Content}" Content="0"/>
+                                            <Label x:Name="hotView" Style="{StaticResource Content}" Content="0"/>
                                         </HeaderedContentControl>
                                     </ItemsControl>
                                     <Rectangle Grid.Row="1" Fill="#ffe6cc" Height="48"/>
-                                    <TextBlock Grid.Row="1" Text="{Binding Content, ElementName=liveStatusView}"
+                                    <TextBlock Grid.Row="1" Text="{Binding Content, ElementName=statusOfLiveView}"
                                                Style="{StaticResource AlignCenter}" FontSize="14" Foreground="Gray"/>
                                     <Button x:Name="startEndBtn02" Height="48" Width="48" Background="#ffab91" Style="{StaticResource ShadowCircleBtnStyle02}" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                             Margin="10,24" Grid.RowSpan="2" Foreground="White" Content="{StaticResource {x:Static local:Constant.PauseSymbolKey}}" />

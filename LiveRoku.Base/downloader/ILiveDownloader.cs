@@ -7,5 +7,7 @@
         LowList<IStatusBinder> StatusBinders { get; }
         LowList<DanmakuResolver> DanmakuResolvers { get; }
         LowList<ILogger> Loggers { get; }
+        RoomInfo fetchRoomInfo(bool refresh);
+        object getExtra(string key);
     }
 }

@@ -83,7 +83,7 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ContentControl Content="{TemplateBinding Header}"/>
+            <ContentControl Content="{TemplateBinding Header}" IsTabStop="False"/>
             <ContentPresenter Grid.Column="1"/>
         </Grid>
     </ControlTemplate>

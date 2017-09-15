@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using LiveRoku.Base;
 using LiveRoku.UI;
+using System.Threading.Tasks;
 
 namespace LiveRoku {
     /// <summary>
@@ -51,11 +52,11 @@ namespace LiveRoku {
         //--------------------------------------
         //IMPLEMENTS Download parameters model
         //--------------------------------------
-        public string RoomId => roomIdBox.Text;
-        public string Folder => settings.DownloadFolder;
-        public string FileFormat => settings.DownloadFileFormat;
-        public bool DownloadDanmaku => saveDanmaku.IsChecked == true;
-        public bool AutoStart => autoStart.IsChecked == true;
+        public string RoomId => Dispatcher.invokeSafely(() => roomIdBox.Text);
+        public string Folder => Dispatcher.invokeSafely(() => settings.DownloadFolder);
+        public string FileFormat => Dispatcher.invokeSafely(() => settings.DownloadFileFormat);
+        public bool DownloadDanmaku => Dispatcher.invokeSafely(() => saveDanmaku.IsChecked == true);
+        public bool AutoStart => Dispatcher.invokeSafely(() => autoStart.IsChecked == true);
         //For generating file name
         public string formatFileName (string realRoomId) {
             return FileFormat.formatPath (realRoomId);
@@ -78,40 +79,56 @@ namespace LiveRoku {
             stoppedSymbol = FindResource(Constant.PauseSymbolKey) as UIElement;
             startedSymbol = FindResource(Constant.RightSymbolKey) as UIElement;
             waitingSymbol = FindResource(Constant.LoadingSymbolKey) as UIElement;
-            //Load core dll
-            object instance = null;
-            var coreDllLoaded = false;
-            var types = PluginLoader.LoadTypesListImpl<ILiveDownloader> (App.coreFolder, App.instance);
-            if (types == null || types.Count () <= 0 ||
-                (instance = Activator.CreateInstance (types.First (), this, "")) == null ||
-                (downloader = instance as ILiveDownloader) == null) {
-                string msg = types == null ? "Core dll not exist." : "Load core dll fail.";
-                System.Threading.Tasks.Task.Run (() => { MessageBox.Show (msg, "Error"); });
-            }else coreDllLoaded = true;
+            string loadError = null;
+            bool isCoreGenerated = generateCore(ref downloader, ref loadError, App.coreFolder, App.instance, this, "");
+            //Load plugins first, safely load all assembly
+            //Let storage deserialize method can find assembly right.
+            if (isCoreGenerated) {
+                plugins = PluginLoader.LoadInstances<IPlugin>(App.pluginFolder, App.instance);
+            } else {
+                Task.Run(() => { MessageBox.Show(loadError, "Error"); });
+            }
             //Subscribe basic events
-            purgeEvents(resubscribe: true, justBasicEvent: !coreDllLoaded);
+            Dispatcher.invokeSafely(() => purgeEvents(resubscribe: true, justBasicEvent: !isCoreGenerated));
             //Get settings
             storage = Storage.StorageHelper.instance(App.dataFolder);
             findSettings();
-            if (coreDllLoaded) {
-                //Load plugins
-                plugins = PluginLoader.LoadInstances<IPlugin>(App.pluginFolder, App.instance);
-                plugins.ForEach(p => p.onInitialize(storage));
+            //Load plugins
+            if (isCoreGenerated) {
+                plugins.forEachSafely(p => p.onInitialize(storage));
                 //Generate helpers
                 //downloader = new LiveDownloader(this, "");
                 downloader.LiveDataResolvers.add(this);
                 downloader.StatusBinders.add(this);
                 downloader.Loggers.add(this);
-                plugins.ForEach(p => p.onAttach(downloader));
+                plugins.forEachSafely(p => p.onAttach(downloader));
             }
         }
 
         protected override void OnClosing (CancelEventArgs e) {
             purgeEvents ();
             downloader?.stop();
-            plugins?.ForEach(p => p.onDetach());
+            plugins?.forEachSafely(p => p.onDetach());
             saveSettings();
             base.OnClosing (e);
+        }
+
+        private bool generateCore(ref ILiveDownloader downloader, ref string error, string folder, IAssemblyCaches assembly, IRequestModel model, string userAgent) {
+            //Load core dll
+            object instance = null;
+            var types = PluginLoader.LoadTypesListImpl<ILiveDownloader> (folder, assembly);
+            try {
+                if (types == null || types.Count() <= 0 ||
+                    (instance = Activator.CreateInstance(types.First(), model, userAgent)) == null ||
+                    (downloader = instance as ILiveDownloader) == null) {
+                    error = types == null ? "Core dll not exist." : "Load core dll fail.";
+                }
+                else return true;
+            }catch(Exception ex) {
+                ex.printStackTrace();
+                error = "Load core error, msg : " + ex.Message;
+            }
+            return false;
         }
 
         private void findSettings () {
@@ -119,10 +136,12 @@ namespace LiveRoku {
             if (!storage.tryGet<MySettings> ("settings", out settings)) {
                 settings = new MySettings ();
             }
-            roomIdBox.Text = settings.LastRoomId.ToString ();
-            saveDanmaku.IsChecked = settings.DownloadDanmaku;
-            autoStart.IsChecked = settings.AutoStart;
-            locationBox.Text = System.IO.Path.Combine (Folder, FileFormat);
+            Dispatcher.invokeSafely(() => {
+                roomIdBox.Text = settings.LastRoomId.ToString();
+                saveDanmaku.IsChecked = settings.DownloadDanmaku;
+                autoStart.IsChecked = settings.AutoStart;
+                locationBox.Text = System.IO.Path.Combine(Folder, FileFormat);
+            });
         }
 
         private void saveSettings () {
@@ -208,6 +227,7 @@ namespace LiveRoku {
                 ctlBtn01.Content = Constant.PreparingText;
                 ctlBtn02.Content = waitingSymbol;
                 false.able (ctlBtn01, ctlBtn02, configViewRoot);
+                statusOfLiveView.Content = Constant.PreparingText;
             });
         }
 
@@ -233,6 +253,7 @@ namespace LiveRoku {
                 ctlBtn01.Content = Constant.StartText;
                 ctlBtn02.Content = stoppedSymbol;
                 true.able (ctlBtn01, ctlBtn02, configViewRoot);
+                statusOfLiveView.Content = Constant.RecordStopText;
             });
         }
         #endregion ---------------------------------------------
@@ -246,9 +267,10 @@ namespace LiveRoku {
             Dispatcher.invokeSafely (() => { debugView.AppendText (info); });
         }
 
-        public void onLiveStatusUpdate (LiveStatus status) {
-            string tips = status.getText ();
+        public void onStatusUpdate(bool on) {
+            string tips = on ? Constant.LiveOnText : Constant.LiveOffText;
             appendLine ("Now status", tips);
+            Dispatcher.invokeSafely(() => { statusOfLiveView.Content = tips; });
         }
 
         public void onDurationUpdate (long duration, string timeText) {
@@ -264,7 +286,7 @@ namespace LiveRoku {
         }
 
         public void onHotUpdate (long popularity) {
-            Dispatcher.invokeSafely (() => { userCountView.Content = popularity; });
+            Dispatcher.invokeSafely (() => { hotView.Content = popularity; });
             System.Diagnostics.Debug.WriteLine ("Updated : Hot -> " + popularity);
         }
 
@@ -274,29 +296,35 @@ namespace LiveRoku {
 
     static class Utils {
 
+        public static void forEachSafely<T>(this List<T> list, Action<T> action) {
+            list.ForEach(o => {
+                try {
+                    action.Invoke(o);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
         public static void able (this bool enable, params UIElement[] elements) {
             foreach (UIElement element in elements) {
                 element.IsEnabled = enable;
             }
         }
-
-        public static string getText (this LiveStatus status) {
-            switch (status) {
-                case LiveStatus.Start:
-                    return "On Live";
-                case LiveStatus.End:
-                    return "Live End";
-                case LiveStatus.Unchecked:
-                    return "Waiting";
-                default:
-                    return string.Empty;
-            }
-        }
-
+        
         public static void invokeSafely (this Dispatcher dispatcher, Action action) {
             if (Thread.CurrentThread == dispatcher.Thread) {
                 action ();
             } else dispatcher.Invoke (DispatcherPriority.Normal, action);
+        }
+
+        public static TResult invokeSafely<TResult>(this Dispatcher dispatcher, Func<TResult> func)
+        {
+            if (Thread.CurrentThread == dispatcher.Thread)
+            {
+                return func();
+            }
+            else return dispatcher.Invoke<TResult>(func, DispatcherPriority.Normal);
         }
 
         public static string formatPath (this string format, string roomId) {
