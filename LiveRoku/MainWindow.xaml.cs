@@ -300,7 +300,7 @@ namespace LiveRoku {
         private void updateTitleClick(object sender, RoutedEventArgs e) {
             var title = downloader.fetchRoomInfo(true)?.Title;
             if (string.IsNullOrEmpty(title)) return;
-            Dispatcher.invokeSafely(() => titleView.Content = title);
+            Dispatcher.invokeSafely(() => titleView.Text = title);
         }
 
         private void hideTitleClick(object sender, MouseButtonEventArgs e) {

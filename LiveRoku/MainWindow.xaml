@@ -159,7 +159,7 @@
                     VerticalAlignment="Bottom"/>
 
                     <!--Expend status info-->
-                    <controls:ExpendEx x:Name="statusEx" VerticalAlignment="Center">
+                    <controls:ExpendEx x:Name="statusEx" IsExpanded="True" VerticalAlignment="Center">
                         <Grid Height="{Binding ActualHeight, ElementName=root}">
                             <ContentControl Margin="10,0" Template="{StaticResource ShadowControl}">
                                 <Grid Background="White">
@@ -177,7 +177,15 @@
                                                 <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
                                             </Style>
                                             <Style x:Key="Content" TargetType="Label">
+                                                <Setter Property="Padding" Value="0,4" />
                                                 <Setter Property="Margin" Value="12,3,0,0" />
+                                                <Setter Property="Foreground" Value="Gray" />
+                                                <Setter Property="FontSize" Value="14" />
+                                                <Setter Property="VerticalAlignment" Value="Center" />
+                                            </Style>
+                                            <Style x:Key="ContentTb" TargetType="TextBlock">
+                                                <Setter Property="Padding" Value="0,4" />
+                                                <Setter Property="Margin" Value="13,3,0,0" />
                                                 <Setter Property="Foreground" Value="Gray" />
                                                 <Setter Property="FontSize" Value="14" />
                                                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -229,8 +237,8 @@
                                                     </Button>
                                                 </Grid>
                                             </HeaderedContentControl.Header>
-                                            <Label x:Name="titleView" Style="{StaticResource Content}" Content="Empty" ToolTipService.InitialShowDelay="0"
-                                                   ToolTip="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                                            <TextBlock x:Name="titleView" Style="{StaticResource ContentTb}" TextTrimming="CharacterEllipsis" Text="Empty" 
+                                                       ToolTipService.InitialShowDelay="0" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
                                         </HeaderedContentControl>
                                         <Rectangle Style="{StaticResource Line}" />
                                         <HeaderedContentControl >
