@@ -199,6 +199,42 @@
                                         </Button>
                                         <HeaderedContentControl >
                                             <HeaderedContentControl.Header>
+                                                <Grid Width="90" Margin="4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="auto"/>
+                                                        <ColumnDefinition />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="Title" Width="auto" Margin="0" MouseLeftButtonUp="hideTitleClick" >
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Header}">
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="Cursor" Value="Hand" />
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <Button Grid.Column="1" Height="24" Width="24" HorizontalAlignment="Left" Click="updateTitleClick">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource TransparentToGrayButtonStyle}">
+                                                                <Setter Property="Cursor" Value="Hand" />
+                                                            </Style>
+                                                        </Button.Style>
+                                                        <Path Data="M10,10 20,20 30,10 M20,0 20,20" Stroke="Black" StrokeThickness="1" Stretch="Uniform" Height="12" Width="20">
+                                                            <Path.CacheMode>
+                                                                <BitmapCache SnapsToDevicePixels="True" />
+                                                            </Path.CacheMode>
+                                                        </Path>
+                                                    </Button>
+                                                </Grid>
+                                            </HeaderedContentControl.Header>
+                                            <Label x:Name="titleView" Style="{StaticResource Content}" Content="Empty" ToolTipService.InitialShowDelay="0"
+                                                   ToolTip="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                                        </HeaderedContentControl>
+                                        <Rectangle Style="{StaticResource Line}" />
+                                        <HeaderedContentControl >
+                                            <HeaderedContentControl.Header>
                                                 <TextBlock Text="Time" Style="{StaticResource Header}"/>
                                             </HeaderedContentControl.Header>
                                             <Label x:Name="recordTimeView" Style="{StaticResource Content}" Content="00:00:00"/>

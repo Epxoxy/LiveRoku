@@ -95,7 +95,10 @@ namespace LiveRoku {
             findSettings();
             //Load plugins
             if (isCoreGenerated) {
-                plugins.forEachSafely(p => p.onInitialize(storage));
+                plugins.forEachSafely(p => {
+                    p.onInitialize(storage);
+                    appendLine("Load", $"{p.GetType().Name} loaded.");
+                });
                 //Generate helpers
                 //downloader = new LiveDownloader(this, "");
                 downloader.LiveDataResolvers.add(this);
@@ -294,6 +297,17 @@ namespace LiveRoku {
 
         #endregion ---------------------------------------------
 
+        private void updateTitleClick(object sender, RoutedEventArgs e) {
+            var title = downloader.fetchRoomInfo(true)?.Title;
+            if (string.IsNullOrEmpty(title)) return;
+            Dispatcher.invokeSafely(() => titleView.Content = title);
+        }
+
+        private void hideTitleClick(object sender, MouseButtonEventArgs e) {
+            titleView.Visibility = titleView.Visibility == Visibility.Visible 
+                ? Visibility.Hidden 
+                : Visibility.Visible;
+        }
     }
 
     static class Utils {
