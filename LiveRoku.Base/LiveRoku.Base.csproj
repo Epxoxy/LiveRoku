@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="downloader\LiveDataResolverBase.cs" />
+    <Compile Include="downloader\StatusBinderBase.cs" />
     <Compile Include="downloader\IDownloader.cs" />
     <Compile Include="downloader\ILiveDataResolver.cs" />
     <Compile Include="common\ILogger.cs" />

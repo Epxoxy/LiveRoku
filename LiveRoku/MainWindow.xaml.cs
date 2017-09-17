@@ -176,7 +176,9 @@ namespace LiveRoku {
             }
         }
 
-        private void scrollEnd (object sender, TextChangedEventArgs e) { }
+        private void scrollEnd (object sender, TextChangedEventArgs e) {
+            (sender as TextBoxBase)?.ScrollToEnd();
+        }
 
         private void startOrStop (object sender, RoutedEventArgs e) {
             if (downloader == null) return;
@@ -205,7 +207,7 @@ namespace LiveRoku {
 
         private void showAbout (object sender, MouseButtonEventArgs e) {
             new MessageDialog (this) {
-                Title = "About LiveRoku",
+                Title = Constant.AboutText,
                     Content = new TextBox {
                         Text = Properties.Resources.About,
                             FontSize = 18,

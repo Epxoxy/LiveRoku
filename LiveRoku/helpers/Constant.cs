@@ -10,5 +10,6 @@
         public static string RecordStopText = "Record stopped";
         public static string LiveOnText = "Live on";
         public static string LiveOffText = "Live off";
+        public static string AboutText = "About LiveRoku";
     }
 }
