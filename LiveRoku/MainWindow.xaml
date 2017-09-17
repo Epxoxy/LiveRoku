@@ -159,7 +159,7 @@
                     VerticalAlignment="Bottom"/>
 
                     <!--Expend status info-->
-                    <controls:ExpendEx x:Name="statusEx" IsExpanded="True" VerticalAlignment="Center">
+                    <controls:ExpendEx x:Name="statusEx" VerticalAlignment="Center">
                         <Grid Height="{Binding ActualHeight, ElementName=root}">
                             <ContentControl Margin="10,0" Template="{StaticResource ShadowControl}">
                                 <Grid Background="White">
