@@ -31,6 +31,7 @@ namespace LiveRoku {
         //--------------------------------------
         private UIElement aboutLink => aboutLinkLabel;
         private UIElement exploreFolder => savepathTextLabel;
+        private UIElement exploreFolder2 => exploreArea; 
         private ButtonBase editPathBtn => openSavepathConfigDialogButton;
         private UIElement configViewRoot => paramsElements;
 
@@ -164,12 +165,14 @@ namespace LiveRoku {
         #region -------------- event handlers --------------
         private void purgeEvents (bool resubscribe = false, bool justBasicEvent = false) {
             exploreFolder.MouseLeftButtonUp -= explore;
+            exploreFolder2.MouseLeftButtonUp -= explore;
             aboutLink.MouseLeftButtonUp -= showAbout;
             editPathBtn.Click -= setLocation;
             ctlBtn01.Click -= startOrStop;
             ctlBtn02.Click -= startOrStop;
             if (resubscribe) {
                 exploreFolder.MouseLeftButtonUp += explore;
+                exploreFolder2.MouseLeftButtonUp += explore;
                 aboutLink.MouseLeftButtonUp += showAbout;
                 editPathBtn.Click += setLocation;
                 if (!justBasicEvent) {

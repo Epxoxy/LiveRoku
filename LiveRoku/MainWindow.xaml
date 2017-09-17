@@ -88,6 +88,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <!--Attach save path box text change event-->
                                                     <TextBlock x:Name="locationTBox" Padding="7,0,4,0" TextTrimming="CharacterEllipsis"
+                                                               ToolTipService.InitialShowDelay="0"
                                                                ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
                                                     <!--Attach open save path configu button click event-->
                                                     <Button x:Name="openSavepathConfigDialogButton" Grid.Column="1" Cursor="Hand" Template="{StaticResource BtnLiteTemplate}">
@@ -212,7 +213,7 @@
                                                         <ColumnDefinition Width="auto"/>
                                                         <ColumnDefinition />
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="Title" Width="auto" Margin="0" MouseLeftButtonUp="hideTitleClick" >
+                                                    <TextBlock Text="Subject" Width="auto" Margin="0" ToolTip="Show/Hide subject" MouseLeftButtonUp="hideTitleClick" >
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock" BasedOn="{StaticResource Header}">
                                                                 <Style.Triggers>
@@ -223,22 +224,26 @@
                                                             </Style>
                                                         </TextBlock.Style>
                                                     </TextBlock>
-                                                    <Button Grid.Column="1" Height="24" Width="24" HorizontalAlignment="Left" Click="updateTitleClick">
+                                                    <Button Grid.Column="1" Height="18" Width="18" Margin="4,0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Click="updateTitleClick"
+                                                            ToolTip="Fetch subject" SnapsToDevicePixels="True">
                                                         <Button.Style>
                                                             <Style TargetType="Button" BasedOn="{StaticResource TransparentToGrayButtonStyle}">
                                                                 <Setter Property="Cursor" Value="Hand" />
                                                             </Style>
                                                         </Button.Style>
-                                                        <Path Data="M10,10 20,20 30,10 M20,0 20,20" Stroke="Black" StrokeThickness="1" Stretch="Uniform" Height="12" Width="20">
+                                                        <Path Data="M10,20 20,10 30,20 M20,35 20,10 M30,25 40,35 50,25 M40,10 40,30" Stroke="Black" StrokeThickness="1" Stretch="Fill" Height="12" Width="15">
                                                             <Path.CacheMode>
-                                                                <BitmapCache SnapsToDevicePixels="True" />
+                                                                <BitmapCache SnapsToDevicePixels="True" EnableClearType="True"/>
                                                             </Path.CacheMode>
                                                         </Path>
                                                     </Button>
                                                 </Grid>
                                             </HeaderedContentControl.Header>
-                                            <TextBlock x:Name="titleView" Style="{StaticResource ContentTb}" TextTrimming="CharacterEllipsis" Text="Empty" 
+                                            <Grid>
+                                                <TextBlock Style="{StaticResource ContentTb}" Text="Implement"/>
+                                                <TextBlock x:Name="titleView" Style="{StaticResource ContentTb}" Background="White" TextTrimming="CharacterEllipsis" Text="Empty" 
                                                        ToolTipService.InitialShowDelay="0" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                                            </Grid>
                                         </HeaderedContentControl>
                                         <Rectangle Style="{StaticResource Line}" />
                                         <HeaderedContentControl >
@@ -269,8 +274,8 @@
                                             <Label x:Name="hotView" Style="{StaticResource Content}" Content="0"/>
                                         </HeaderedContentControl>
                                     </ItemsControl>
-                                    <Rectangle Grid.Row="1" Fill="#ffe6cc" Height="48"/>
-                                    <TextBlock Grid.Row="1" Text="{Binding Content, ElementName=statusOfLiveView}"
+                                    <Rectangle x:Name="exploreArea" Grid.Row="1" Fill="#ffe6cc" Height="48" Cursor="Hand" ToolTip="Click to open location"/>
+                                    <TextBlock Grid.Row="1" Text="{Binding Content, ElementName=statusOfLiveView}" IsHitTestVisible="False"
                                                Style="{StaticResource AlignCenter}" FontSize="14" Foreground="Gray"/>
                                     <Button x:Name="startEndBtn02" Height="48" Width="48" Background="#ffab91" Style="{StaticResource ShadowCircleBtnStyle02}" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                             Margin="10,24" Grid.RowSpan="2" Foreground="White" Content="{StaticResource {x:Static local:Constant.PauseSymbolKey}}" />
