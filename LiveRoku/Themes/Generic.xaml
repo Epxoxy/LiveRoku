@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:LiveRoku"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
     xmlns:converters="clr-namespace:LiveRoku.UI.converters"
     xmlns:controls="clr-namespace:LiveRoku.UI.controls"
     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero">
@@ -24,29 +25,31 @@
     <Color x:Key="Common.F7A.Color" A="255" R="122" G="122" B="122"/>
     <Color x:Key="Common.All9.Color" A="255" R="153" G="153" B="153"/>
     <Color x:Key="DefButton.Static.Border.Color" A="255" R="112" G="112" B="112"/>
+    <Color x:Key="DefButton.Disabled.Background.Color" A="255" R="244" G="244" B="244"/>
+    <Color x:Key="Common.F4.Color" A="255" R="244" G="244" B="244"/>
     <!--Brushes-->
     <SolidColorBrush x:Key="TextBox.Static.Border" Color="LightGray"/>
     <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="SkyBlue"/>
     <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
-    <SolidColorBrush x:Key="Button.Disabled.Background" Color="#f4f4f4"/>
+    <SolidColorBrush x:Key="Button.Disabled.Background" Color="{StaticResource Common.F4.Color}"/>
     <SolidColorBrush x:Key="Button.Disabled.Border" Color="{StaticResource DefButton.Disabled.Border.Color}"/>
     <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="{StaticResource Common.F83.Color}"/>
     <SolidColorBrush x:Key="Button.Static.Border" Color="{StaticResource DefButton.Static.Border.Color}"/>
     <SolidColorBrush x:Key="WindowsTenButton.MouseOver.Brush"  Color="{StaticResource Common.F7A.Color}"/>
     <SolidColorBrush x:Key="NormalButton.Static.Background" Color="#FFDDDDDD"/>
-    <SolidColorBrush x:Key="Expander.MouseOver.Background" Color="#f4f4f4"/>
+    <SolidColorBrush x:Key="Expander.MouseOver.Background" Color="{StaticResource Common.F4.Color}"/>
     <SolidColorBrush x:Key="CheckBox.Checked.Fill" Color="SkyBlue"/>
     <SolidColorBrush x:Key="CheckBox.Unchecked.Fill" Color="#747474"/>
     <SolidColorBrush x:Key="Common.F5.Brush" Color="#f5f5f5"/>
     <SolidColorBrush x:Key="Thumb.Static.Background" Color="{StaticResource Thumb.Static.Color}"/>
-    <GradientStopCollection x:Key="ShadowGSC01">
+    <GradientStopCollection x:Key="ShadowGSC01" po:Freeze="True">
         <GradientStop Color="{StaticResource gs1}" Offset="0" />
         <GradientStop Color="{StaticResource gs0}" Offset="1" />
     </GradientStopCollection>
-    <LinearGradientBrush x:Key="HorizontalShadowToLeft" StartPoint="0,0" EndPoint="1,0" GradientStops="{StaticResource ShadowGSC01}" />
-    <LinearGradientBrush x:Key="HorizontalShadowToRight" StartPoint="1,0" EndPoint="0,0" GradientStops="{StaticResource ShadowGSC01}" />
-    <LinearGradientBrush x:Key="VerticalShadowToBottom" StartPoint="0,1" EndPoint="0,0" GradientStops="{StaticResource ShadowGSC01}" />
-    <LinearGradientBrush x:Key="VerticalShadowToUp" StartPoint="0,0" EndPoint="0,1" GradientStops="{StaticResource ShadowGSC01}" />
+    <LinearGradientBrush x:Key="HorizontalShadowToLeft" StartPoint="0,0" EndPoint="1,0" GradientStops="{StaticResource ShadowGSC01}" po:Freeze="True"/>
+    <LinearGradientBrush x:Key="HorizontalShadowToRight" StartPoint="1,0" EndPoint="0,0" GradientStops="{StaticResource ShadowGSC01}" po:Freeze="True"/>
+    <LinearGradientBrush x:Key="VerticalShadowToBottom" StartPoint="0,1" EndPoint="0,0" GradientStops="{StaticResource ShadowGSC01}" po:Freeze="True"/>
+    <LinearGradientBrush x:Key="VerticalShadowToUp" StartPoint="0,0" EndPoint="0,1" GradientStops="{StaticResource ShadowGSC01}" po:Freeze="True"/>
     <!--Converters-->
     <converters:MathMultipleConverter x:Key="MathMlpMultipleConverter" />
     <DataTemplate x:Key="BackArrow">
@@ -918,6 +921,8 @@
                                 </VisualState>
                                 <VisualState x:Name="Disabled">
                                     <Storyboard>
+                                        <ColorAnimation Duration="0:0:0.1" Storyboard.TargetProperty="(Button.BorderBrush).(SolidColorBrush.Color)" To="{StaticResource DefButton.Disabled.Border.Color}"/>
+                                        <ColorAnimation Duration="0:0:0.1" Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)" To="{StaticResource Common.F4.Color}"/>
                                         <ColorAnimation Duration="0:0:0.1" Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)" To="{StaticResource Common.F83.Color}"/>
                                     </Storyboard>
                                 </VisualState>
@@ -932,10 +937,6 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="Button.IsDefaulted" Value="true">
                             <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="false">
-                            <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
-                            <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

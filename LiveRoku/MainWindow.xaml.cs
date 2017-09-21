@@ -225,6 +225,20 @@ namespace LiveRoku {
                     }
             }.ShowDialog ();
         }
+
+        private void updateTitleClick(object sender, RoutedEventArgs e) {
+            Task.Run(() => {
+                var title = downloader.fetchRoomInfo(true)?.Title;
+                if (string.IsNullOrEmpty(title)) return;
+                Dispatcher.invokeSafely(() => titleView.Text = title);
+            });
+        }
+
+        private void hideTitleClick(object sender, MouseButtonEventArgs e) {
+            titleView.Visibility = titleView.Visibility == Visibility.Visible 
+                ? Visibility.Hidden 
+                : Visibility.Visible;
+        }
         #endregion ------------------------------------------
 
         //Part for controlling the UIElement status
@@ -300,17 +314,6 @@ namespace LiveRoku {
 
         #endregion ---------------------------------------------
 
-        private void updateTitleClick(object sender, RoutedEventArgs e) {
-            var title = downloader.fetchRoomInfo(true)?.Title;
-            if (string.IsNullOrEmpty(title)) return;
-            Dispatcher.invokeSafely(() => titleView.Text = title);
-        }
-
-        private void hideTitleClick(object sender, MouseButtonEventArgs e) {
-            titleView.Visibility = titleView.Visibility == Visibility.Visible 
-                ? Visibility.Hidden 
-                : Visibility.Visible;
-        }
     }
 
     static class Utils {

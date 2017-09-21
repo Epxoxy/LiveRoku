@@ -16,7 +16,8 @@ namespace LiveRoku {
         public static readonly string dataFolder = baseFolder + "data";
         public static readonly string pluginFolder = baseFolder + "plugins";
         public static readonly string coreFolder = baseFolder + "core";
-        private static readonly string debugPath = baseFolder + "debug.txt";
+        private static readonly string debugFolder = baseFolder + "debug";
+        private static readonly string debugPath = debugFolder + "\\debug.txt";
         private Dictionary<string, Assembly> assemblyCache;
         private LogTraceListener logTracker;
         public static App instance;
@@ -130,11 +131,9 @@ namespace LiveRoku {
             }
             lb.AppendLine ("--------- End  ---------");
             lb.AppendLine ();
-
-            string location = System.Reflection.Assembly.GetExecutingAssembly ().Location;
-            string dir = System.IO.Path.GetDirectoryName (location);
-            string log = dir + "\\log.txt";
-            using (var sw = new System.IO.StreamWriter (log, true, System.Text.Encoding.UTF8)) {
+            
+            string logPath = debugFolder + "\\log.txt";
+            using (var sw = new System.IO.StreamWriter (logPath, true, System.Text.Encoding.UTF8)) {
                 sw.Write (lb.ToString ());
             }
             logTracker.WriteToFileAndClear ();
