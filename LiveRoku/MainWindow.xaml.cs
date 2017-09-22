@@ -284,8 +284,8 @@ namespace LiveRoku {
         #region ------------- implement interfaces -------------
 
         public void appendLine (string tag, string log) {
-            string info = $"[{tag}] {log}";
-            System.Diagnostics.Debug.WriteLine (info);
+            string info = $"[{tag}] {log}\n";
+            System.Diagnostics.Debug.WriteLine (log , tag);
             Dispatcher.invokeSafely (() => { debugView.AppendText (info); });
         }
 
