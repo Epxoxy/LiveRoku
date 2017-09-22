@@ -33,7 +33,7 @@ namespace LiveRoku
 
         public override void WriteLine (string message) {
             if (!string.IsNullOrEmpty(message)) {
-                message = message.Replace(Environment.NewLine, $"{Environment.NewLine}----------------");
+                message = message.Replace("\n", $"{Environment.NewLine}----------------");
             }
             Write ("[" + DateTime.Now.ToString ("yyyy-MM-dd HH:mm:ss.fff") + "] " + message + Environment.NewLine);
         }
