@@ -9,5 +9,6 @@
         LowList<ILogger> Loggers { get; }
         RoomInfo fetchRoomInfo(bool refresh);
         object getExtra(string key);
+        void setExtra(string key, object value);
     }
 }
