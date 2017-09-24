@@ -7,6 +7,7 @@
         public static string StopText = "Stop";
         public static string PreparingText = "Preparing";
         public static string WaitingText = "Waiting";
+        public static string RecordingText = "Recording";
         public static string RecordStopText = "Record stopped";
         public static string LiveOnText = "Live on";
         public static string LiveOffText = "Live off";

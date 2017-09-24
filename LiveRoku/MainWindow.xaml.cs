@@ -259,6 +259,7 @@ namespace LiveRoku {
                 ctlBtn02.Content = waitingSymbol;
                 false.able (configViewRoot);
                 true.able (ctlBtn01, ctlBtn02);
+                statusOfLiveView.Content = Constant.WaitingText;
             });
         }
 
@@ -267,6 +268,7 @@ namespace LiveRoku {
                 ctlBtn01.Content = Constant.StopText;
                 ctlBtn02.Content = startedSymbol;
                 true.able (ctlBtn01, ctlBtn02);
+                statusOfLiveView.Content = Constant.RecordingText;
             });
         }
 
