@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using LiveRoku.Base;
 using LiveRoku.UI;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace LiveRoku {
     /// <summary>
@@ -288,7 +289,23 @@ namespace LiveRoku {
         public void appendLine (string tag, string log) {
             string info = $"[{tag}] {log}\n";
             System.Diagnostics.Debug.WriteLine (log , tag);
-            Dispatcher.invokeSafely (() => { debugView.AppendText (info); });
+            Dispatcher.invokeSafely (() => {
+                if (debugView.Text.Length > 25600) {
+                    var text = debugView.Text.Substring(12800);
+                    var index2 = text.IndexOf("\n");
+                    var builder = new StringBuilder();
+                    if (index2 > 0) {
+                        builder.Append(text.Substring(index2));
+                    } else {
+                        builder.Append(text);
+                    }
+                    builder.Append(info);
+                    debugView.Clear();
+                    debugView.AppendText(builder.ToString());
+                } else {
+                    debugView.AppendText (info); 
+                }
+            });
         }
 
         public void onStatusUpdate(bool on) {
