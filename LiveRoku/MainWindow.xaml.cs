@@ -97,6 +97,22 @@ namespace LiveRoku {
             findSettings();
             //Load plugins
             if (isCoreGenerated) {
+                for(int i = 0; i < plugins.Count; i++) {
+                    var typeName = plugins[i].GetType().Name;
+                    if (!settings.Plugins.ContainsKey(typeName)) {
+                        settings.Plugins.Add(typeName, true);
+                    }else if (!settings.Plugins[typeName]) {
+                        plugins.Remove(plugins[i]);
+                        System.Diagnostics.Debug.WriteLine("remove " + typeName);
+                    } else {
+                        settings.Plugins[typeName] = true;
+                    }
+                }
+                if (settings.Extras != null && settings.Extras.Count > 0) {
+                    foreach (var key in settings.Extras.Keys) {
+                        downloader.setExtra(key, settings.Extras[key]);
+                    }
+                }
                 plugins.forEachSafely(p => {
                     p.onInitialize(storage);
                     appendLine("Load", $"{p.GetType().Name} loaded.");

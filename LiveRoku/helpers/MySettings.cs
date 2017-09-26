@@ -9,6 +9,8 @@ namespace LiveRoku {
         public string DownloadFileFormat { get; set; } = "{roomId}-{Y}-{M}-{d}-{H}-{m}-{s}.flv";
         public bool AutoStart { get; set; } = true;
         public bool DownloadDanmaku { get; set; } = true;
+        public Dictionary<string, object> Extras { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, bool> Plugins { get; set; } = new Dictionary<string, bool>();
 
         public void addLastRoomId (int roomId) {
             LastRoomId = roomId;

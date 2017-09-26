@@ -7,8 +7,10 @@
         LowList<IStatusBinder> StatusBinders { get; }
         LowList<DanmakuResolver> DanmakuResolvers { get; }
         LowList<ILogger> Loggers { get; }
+
         RoomInfo fetchRoomInfo(bool refresh);
-        object getExtra(string key);
         void setExtra(string key, object value);
+        object getExtra(string key);
+        bool IsStreaming { get; }
     }
 }
