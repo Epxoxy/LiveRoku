@@ -74,8 +74,9 @@
     </ApplicationDefinition>
     <Compile Include="helpers\Constant.cs" />
     <Compile Include="helpers\debugex\DebugHelper.cs" />
-    <Compile Include="helpers\IAssemblyCaches.cs" />
     <Compile Include="helpers\debugex\LogTraceListener.cs" />
+    <Compile Include="helpers\plugin\IAssemblyCaches.cs" />
+    <Compile Include="helpers\plugin\PluginLoader.cs" />
     <Compile Include="storage\FileHelper.cs" />
     <Compile Include="storage\SerializeHelper.cs" />
     <Compile Include="storage\StorageHelper.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="LocationSettings.xaml.cs">
       <DependentUpon>LocationSettings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="helpers\PluginLoader.cs" />
     <Compile Include="ui\controls\dialog\DialogResult.cs" />
     <Compile Include="ui\controls\dialog\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>

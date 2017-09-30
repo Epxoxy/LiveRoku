@@ -1,6 +1,6 @@
 ﻿namespace LiveRoku.Base{
     //Model interface for requesting download live video
-    public interface IRequestModel {
+    public interface IFetchSettings {
         string RoomId { get; }
         string Folder { get; }
         string FileFormat { get; }

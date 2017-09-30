@@ -17,7 +17,7 @@ namespace LiveRoku {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, ILogger, IRequestModel, ILiveDataResolver, IStatusBinder {
+    public partial class MainWindow : Window, ILogHandler, IFetchSettings, ILiveProgressBinder, IStatusBinder {
         #region ------- UIElements proxy -----------
         //--------------------------------------
         //PART A : UIElements for IConfigHolder
@@ -65,10 +65,10 @@ namespace LiveRoku {
         }
 
         //Helpers
-        private ILiveDownloader downloader;
         private MySettings settings;
         private IStorage storage;
         private List<IPlugin> plugins;
+        private ILiveFetcher fetcher;
 
         public MainWindow () {
             InitializeComponent ();
@@ -82,21 +82,21 @@ namespace LiveRoku {
             startedSymbol = FindResource(Constant.RightSymbolKey) as UIElement;
             waitingSymbol = FindResource(Constant.LoadingSymbolKey) as UIElement;
             string loadError = null;
-            bool isCoreGenerated = generateCore(ref downloader, ref loadError, App.coreFolder, App.instance, this, "");
+            bool coreLoaded = tryInitCore(ref fetcher, ref loadError, App.coreFolder, App.instance, this, "");
             //Load plugins first, safely load all assembly
             //Let storage deserialize method can find assembly right.
-            if (isCoreGenerated) {
+            if (coreLoaded) {
                 plugins = PluginLoader.LoadInstances<IPlugin>(App.pluginFolder, App.instance);
             } else {
                 Task.Run(() => { MessageBox.Show(loadError, "Error"); });
             }
             //Subscribe basic events
-            Dispatcher.invokeSafely(() => purgeEvents(resubscribe: true, justBasicEvent: !isCoreGenerated));
+            Dispatcher.invokeSafely(() => purgeEvents(resubscribe: true, justBasicEvent: !coreLoaded));
             //Get settings
             storage = Storage.StorageHelper.instance(App.dataFolder);
             findSettings();
             //Load plugins
-            if (isCoreGenerated) {
+            if (coreLoaded) {
                 for(int i = 0; i < plugins.Count; i++) {
                     var typeName = plugins[i].GetType().Name;
                     if (!settings.Plugins.ContainsKey(typeName)) {
@@ -110,42 +110,43 @@ namespace LiveRoku {
                 }
                 if (settings.Extras != null && settings.Extras.Count > 0) {
                     foreach (var key in settings.Extras.Keys) {
-                        downloader.setExtra(key, settings.Extras[key]);
+                        fetcher.setExtra(key, settings.Extras[key]);
                     }
                 }
                 plugins.forEachSafely(p => {
                     p.onInitialize(storage);
-                    appendLine("Load", $"{p.GetType().Name} loaded.");
+                    fetcher.Logger.log(Level.Info, $"{p.GetType().Name} loaded.");
                 });
                 //Generate helpers
                 //downloader = new LiveDownloader(this, "");
-                downloader.LiveDataResolvers.add(this);
-                downloader.StatusBinders.add(this);
-                downloader.Loggers.add(this);
-                plugins.forEachSafely(p => p.onAttach(downloader));
+                fetcher.Logger.LogHandlers.add(this);
+                fetcher.LiveProgressBinders.add(this);
+                fetcher.StatusBinders.add(this);
+                plugins.forEachSafely(p => p.onAttach(fetcher));
             }
         }
 
         protected override void OnClosing (CancelEventArgs e) {
             purgeEvents ();
-            downloader?.stop();
+            fetcher?.Dispose();
             plugins?.forEachSafely(p => p.onDetach());
             saveSettings();
             base.OnClosing (e);
         }
 
-        private bool generateCore(ref ILiveDownloader downloader, ref string error, string folder, IAssemblyCaches assembly, IRequestModel model, string userAgent) {
+        private bool tryInitCore(ref ILiveFetcher fetcher, ref string error, string folder, IAssemblyCaches assembly, IFetchSettings settings, string userAgent) {
             //Load core dll
-            object instance = null;
-            var types = PluginLoader.LoadTypesListImpl<ILiveDownloader> (folder, assembly);
+            var types = PluginLoader.LoadTypesListImpl<ILiveFetcher> (folder, assembly);
             try {
+                object instance;
                 if (types == null || types.Count() <= 0 ||
-                    (instance = Activator.CreateInstance(types.First(), model, userAgent)) == null ||
-                    (downloader = instance as ILiveDownloader) == null) {
+                   (instance = Activator.CreateInstance(types.First(), settings, userAgent)) == null ||
+                   (fetcher = instance as ILiveFetcher) == null) {
                     error = types == null ? "Core dll not exist." : "Load core dll fail.";
                 }
                 else return true;
-            }catch(Exception ex) {
+            }
+            catch(Exception ex) {
                 ex.printStackTrace();
                 error = "Load core error, msg : " + ex.Message;
             }
@@ -204,10 +205,10 @@ namespace LiveRoku {
         }
 
         private void startOrStop (object sender, RoutedEventArgs e) {
-            if (downloader == null) return;
-            if (downloader.IsRunning)
-                downloader.stop ();
-            else downloader.start ();
+            if (fetcher == null) return;
+            if (fetcher.IsRunning)
+                fetcher.stop ();
+            else fetcher.start ();
         }
 
         private void setLocation (object sender, RoutedEventArgs e) {
@@ -245,7 +246,7 @@ namespace LiveRoku {
 
         private void updateTitleClick(object sender, RoutedEventArgs e) {
             Task.Run(() => {
-                var title = downloader.fetchRoomInfo(true)?.Title;
+                var title = fetcher.fetchRoomInfo(true)?.Title;
                 if (string.IsNullOrEmpty(title)) return;
                 Dispatcher.invokeSafely(() => titleView.Text = title);
             });
@@ -301,10 +302,10 @@ namespace LiveRoku {
 
         //Part for showing some data in UIElements which named end with view
         #region ------------- implement interfaces -------------
-
-        public void appendLine (string tag, string log) {
-            string info = $"[{tag}] {log}\n";
-            System.Diagnostics.Debug.WriteLine (log , tag);
+        
+        public void onLog(Level level, string message) {
+            string info = $"[{level}] {message}\n";
+            System.Diagnostics.Debug.WriteLine (message, level.ToString());
             Dispatcher.invokeSafely (() => {
                 if (debugView.Text.Length > 25600) {
                     var text = debugView.Text.Substring(12800);
@@ -326,7 +327,7 @@ namespace LiveRoku {
 
         public void onStatusUpdate(bool on) {
             string tips = on ? Constant.LiveOnText : Constant.LiveOffText;
-            appendLine ("Now status", tips);
+            fetcher.Logger.log(Level.Info, "Now status is " + tips);
             Dispatcher.invokeSafely(() => { statusOfLiveView.Content = tips; });
         }
 
@@ -346,7 +347,7 @@ namespace LiveRoku {
             Dispatcher.invokeSafely (() => { hotView.Content = popularity; });
             System.Diagnostics.Debug.WriteLine ("Updated : Hot -> " + popularity);
         }
-
+        
         #endregion ---------------------------------------------
 
     }

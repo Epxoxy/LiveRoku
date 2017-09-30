@@ -40,21 +40,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="downloader\LiveDataResolverBase.cs" />
-    <Compile Include="downloader\StatusBinderBase.cs" />
+    <Compile Include="downloader\handlers\DanmakuResolver.cs" />
+    <Compile Include="downloader\handlers\LiveProgressBinderBase.cs" />
+    <Compile Include="downloader\handlers\StatusBinderBase.cs" />
     <Compile Include="downloader\IDownloader.cs" />
-    <Compile Include="downloader\ILiveDataResolver.cs" />
-    <Compile Include="common\ILogger.cs" />
+    <Compile Include="downloader\handlers\ILiveProgressBinder.cs" />
+    <Compile Include="logger\ILogHandler.cs" />
+    <Compile Include="logger\ILogger.cs" />
     <Compile Include="common\IPlugin.cs" />
-    <Compile Include="downloader\IStatusBinder.cs" />
+    <Compile Include="downloader\handlers\IStatusBinder.cs" />
     <Compile Include="common\IStorage.cs" />
-    <Compile Include="downloader\ILiveDownloader.cs" />
-    <Compile Include="model\IRequestModel.cs" />
+    <Compile Include="downloader\ILiveFetcher.cs" />
+    <Compile Include="logger\Level.cs" />
+    <Compile Include="downloader\IFetchSettings.cs" />
     <Compile Include="model\LowList.cs" />
     <Compile Include="model\DanmakuModel.cs" />
     <Compile Include="model\GiftRank.cs" />
     <Compile Include="model\RoomInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="logger\SimpleLogger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

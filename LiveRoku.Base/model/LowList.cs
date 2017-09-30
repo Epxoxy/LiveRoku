@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace LiveRoku.Base {
     //A list wrapper for provider low function
@@ -33,7 +35,7 @@ namespace LiveRoku.Base {
             source.Clear ();
         }
 
-        public void forEachEx (Action<T> action, Action<Exception> onError) {
+        public void forEachSafely (Action<T> action, Action<Exception> onError) {
             source.ForEach (target => {
                 if (null != target) {
                     try {
@@ -43,6 +45,10 @@ namespace LiveRoku.Base {
                     }
                 }
             });
+        }
+
+        public Task forEachSafelyAsync(Action<T> action, Action<Exception> onError) {
+            return Task.Run(() => forEachSafely(action, onError));
         }
     }
 }
