@@ -59,10 +59,6 @@ namespace LiveRoku {
         public string FileFormat => Dispatcher.invokeSafely(() => settings.DownloadFileFormat);
         public bool DownloadDanmaku => Dispatcher.invokeSafely(() => saveDanmaku.IsChecked == true);
         public bool AutoStart => Dispatcher.invokeSafely(() => autoStart.IsChecked == true);
-        //For generating file name
-        public string formatFileName (string realRoomId) {
-            return FileFormat.formatPath (realRoomId);
-        }
 
         //Helpers
         private MySettings settings;
@@ -110,7 +106,7 @@ namespace LiveRoku {
                 }
                 if (settings.Extras != null && settings.Extras.Count > 0) {
                     foreach (var key in settings.Extras.Keys) {
-                        fetcher.setExtra(key, settings.Extras[key]);
+                        fetcher.putExtra(key, settings.Extras[key]);
                     }
                 }
                 plugins.forEachSafely(p => {
@@ -347,7 +343,10 @@ namespace LiveRoku {
             Dispatcher.invokeSafely (() => { hotView.Content = popularity; });
             System.Diagnostics.Debug.WriteLine ("Updated : Hot -> " + popularity);
         }
-        
+
+        public void onMissionComplete(IMission mission) {
+        }
+
         #endregion ---------------------------------------------
 
     }
@@ -384,16 +383,7 @@ namespace LiveRoku {
             }
             else return dispatcher.Invoke<TResult>(func, DispatcherPriority.Normal);
         }
-
-        public static string formatPath (this string format, string roomId) {
-            return format.Replace ("{roomId}", roomId)
-                .Replace ("{Y}", DateTime.Now.Year.ToString ())
-                .Replace ("{M}", DateTime.Now.Month.ToString ())
-                .Replace ("{d}", DateTime.Now.Day.ToString ())
-                .Replace ("{H}", DateTime.Now.Hour.ToString ())
-                .Replace ("{m}", DateTime.Now.Minute.ToString ())
-                .Replace ("{s}", DateTime.Now.Second.ToString ());;
-        }
+        
     }
 
 }

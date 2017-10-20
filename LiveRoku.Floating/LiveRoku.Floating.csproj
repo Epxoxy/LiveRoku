@@ -4,29 +4,26 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FA861330-DCED-4E5D-8310-7A87254C211D}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{454FC7A4-2F7E-461A-9210-225E36FC0A11}</ProjectGuid>
+    <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LiveRoku</RootNamespace>
-    <AssemblyName>LiveRoku</AssemblyName>
+    <RootNamespace>LiveRoku.Floating</RootNamespace>
+    <AssemblyName>LiveRoku.Floating</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\LiveRoku\bin\Debug\plugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,29 +32,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>appicon.ico</ApplicationIcon>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LiveRoku.Base, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\LiveRoku.Base.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -72,61 +63,35 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="helpers\Constant.cs" />
-    <Compile Include="helpers\debugex\DebugHelper.cs" />
-    <Compile Include="helpers\debugex\LogTraceListener.cs" />
-    <Compile Include="helpers\plugin\IAssemblyCaches.cs" />
-    <Compile Include="helpers\plugin\PluginLoader.cs" />
-    <Compile Include="storage\FileHelper.cs" />
-    <Compile Include="storage\SerializeHelper.cs" />
-    <Compile Include="storage\StorageHelper.cs" />
-    <Compile Include="helpers\TextBoxHelper.cs" />
-    <Compile Include="ui\controls\DelayFitSizeWrapper.cs" />
-    <Compile Include="ui\controls\dependency\PlaceHolder.cs" />
-    <Compile Include="ui\controls\dependency\ScrollViewerAttach.cs" />
-    <Compile Include="ui\controls\ExpendEx.cs" />
-    <Compile Include="ui\converters\BoolSelectorConverter.cs" />
-    <Compile Include="ui\converters\BoolToVisibilityConverter.cs" />
-    <Compile Include="ui\converters\MathMultipleConverter.cs" />
-    <Compile Include="LocationSettings.xaml.cs">
-      <DependentUpon>LocationSettings.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ui\controls\dialog\DialogResult.cs" />
-    <Compile Include="ui\controls\dialog\MessageDialog.xaml.cs">
-      <DependentUpon>MessageDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ui\controls\ToastWrapper.cs" />
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="LocationSettings.xaml">
+    <Page Include="ui\MessageFlowBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="ui\controls\dialog\MessageDialog.xaml">
+    <Page Include="ui\FloatingBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="helpers\MySettings.cs" />
+    <Compile Include="basic\basic\MessageBean.cs" />
+    <Compile Include="ui\SelectableTextBlock.cs" />
+    <Compile Include="basic\wrappers\FlowAnimationWrapper.cs" />
+    <Compile Include="api\PopupHelper.cs" />
+    <Compile Include="api\Win32API.cs" />
+    <Compile Include="Constant.cs" />
+    <Compile Include="basic\basic\IHost.cs" />
+    <Compile Include="basic\wrappers\MessageWrapper.cs" />
+    <Compile Include="basic\helpers\Extension.cs" />
+    <Compile Include="ui\MessageFlowBox.xaml.cs">
+      <DependentUpon>MessageFlowBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ui\ScrollBinder.cs" />
+    <Compile Include="basic\basic\TipsType.cs" />
+    <Compile Include="ui\FloatingBox.xaml.cs">
+      <DependentUpon>FloatingBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FloatingPlugin.cs" />
+    <Compile Include="basic\basic\LocationSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -140,25 +105,18 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="basic\wrappers\TimerWrapper.cs" />
+    <Compile Include="basic\helpers\VisualTreeHelperEx.cs" />
+    <Compile Include="basic\wrappers\TextEditorWrapper.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.manifest">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="appicon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
