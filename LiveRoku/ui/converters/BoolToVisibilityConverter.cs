@@ -3,19 +3,16 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace LiveRoku.UI.converters
-{
+namespace LiveRoku.UI.converters {
     /// <summary>
     /// Converts <see cref="bool" /> instances to <see cref="Visibility" /> instances.
     /// </summary>
-    [ValueConversion(typeof(bool), typeof(Visibility))]
-    public class BoolToVisibilityConverter : IValueConverter
-    {
+    [ValueConversion (typeof (bool), typeof (Visibility))]
+    public class BoolToVisibilityConverter : IValueConverter {
         /// <summary>
         /// Initializes a new instance of the <see cref="BoolToVisibilityConverter" /> class.
         /// </summary>
-        public BoolToVisibilityConverter()
-        {
+        public BoolToVisibilityConverter () {
             this.InvertVisibility = false;
             this.NotVisibleValue = Visibility.Collapsed;
         }
@@ -41,21 +38,17 @@ namespace LiveRoku.UI.converters
         /// <returns>
         /// A converted value. If the method returns <c>null</c>, the valid <c>null</c> value is used.
         /// </returns>
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
+        public object Convert (object value, Type targetType, object parameter, CultureInfo culture) {
+            if (value == null) {
                 return Visibility.Visible;
             }
 
             bool visible = true;
-            if (value is bool)
-            {
-                visible = (bool)value;
+            if (value is bool) {
+                visible = (bool) value;
             }
 
-            if (this.InvertVisibility)
-            {
+            if (this.InvertVisibility) {
                 visible = !visible;
             }
 
@@ -72,11 +65,10 @@ namespace LiveRoku.UI.converters
         /// <returns>
         /// A converted value. If the method returns <c>null</c>, the valid <c>null</c> value is used.
         /// </returns>
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return ((value is Visibility) && (((Visibility)value) == Visibility.Visible))
-                       ? !this.InvertVisibility
-                       : this.InvertVisibility;
+        public object ConvertBack (object value, Type targetType, object parameter, CultureInfo culture) {
+            return ((value is Visibility) && (((Visibility) value) == Visibility.Visible)) ?
+                !this.InvertVisibility :
+                this.InvertVisibility;
         }
     }
 }

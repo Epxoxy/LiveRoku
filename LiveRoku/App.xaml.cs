@@ -34,9 +34,9 @@ namespace LiveRoku {
 
         #region Assembly help
 
-        public bool tryGet(string fullName, out Assembly assembly){
+        public bool tryGet (string fullName, out Assembly assembly) {
             assembly = null;
-            if (assemblyCache.ContainsKey(fullName)) {
+            if (assemblyCache.ContainsKey (fullName)) {
                 assembly = assemblyCache[fullName];
             }
             if (assembly == null)
@@ -131,7 +131,7 @@ namespace LiveRoku {
             }
             lb.AppendLine ("--------- End  ---------");
             lb.AppendLine ();
-            
+
             string logPath = debugFolder + "\\log.txt";
             using (var sw = new System.IO.StreamWriter (logPath, true, System.Text.Encoding.UTF8)) {
                 sw.Write (lb.ToString ());

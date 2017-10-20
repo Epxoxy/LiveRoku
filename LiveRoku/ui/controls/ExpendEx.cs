@@ -22,8 +22,8 @@ namespace LiveRoku.UI.controls {
 
         static ExpendEx () {
             DefaultStyleKeyProperty.OverrideMetadata (typeof (ExpendEx), new FrameworkPropertyMetadata (typeof (ExpendEx)));
-            KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(ExpendEx), new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
-            initializeCommand();
+            KeyboardNavigation.TabNavigationProperty.OverrideMetadata (typeof (ExpendEx), new FrameworkPropertyMetadata (KeyboardNavigationMode.Cycle));
+            initializeCommand ();
         }
 
         public bool IsExpanded {
@@ -39,8 +39,8 @@ namespace LiveRoku.UI.controls {
         }
 
         private void updateState (bool isExpand) {
-            if (isExpand) Keyboard.Focus(this);
-            else Keyboard.ClearFocus();
+            if (isExpand) Keyboard.Focus (this);
+            else Keyboard.ClearFocus ();
             VisualStateManager.GoToState (this, isExpand ? "Expanded" : "Collapsed", true);
         }
 

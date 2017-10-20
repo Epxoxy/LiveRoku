@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using LiveRoku.Floating.helpers;
 
-
 namespace LiveRoku.Floating {
     /// <summary>
     /// Interaction logic for MessageFlowBox.xaml

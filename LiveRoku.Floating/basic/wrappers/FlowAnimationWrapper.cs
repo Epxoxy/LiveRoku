@@ -57,7 +57,7 @@ namespace LiveRoku.Floating {
                 }
                 var scrollable = host.ScrollableHeight - host.VerticalOffset;
                 var times = (scrollable / 40);
-                var offset = (times < maxVisible ? Math.Max(1, times) : 7) * 40;
+                var offset = (times < maxVisible ? Math.Max (1, times) : 7) * 40;
                 fromFrame.Value = this.host.VerticalOffset;
                 toFrame.Value = fromFrame.Value + offset;
                 //toFrame.KeyTime = times < maxVisible ? slowTime : normalTime;

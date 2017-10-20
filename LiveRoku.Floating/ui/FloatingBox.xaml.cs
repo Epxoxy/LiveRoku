@@ -8,7 +8,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using LiveRoku.Floating.helpers;
 
-
 namespace LiveRoku.Floating {
     /// <summary>
     /// Interaction logic for FloatingBox.xaml

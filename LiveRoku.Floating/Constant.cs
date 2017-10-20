@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LiveRoku.Floating
-{
+namespace LiveRoku.Floating {
     public class Constant {
         public const string MessageFlowBoxKey = "msgflowbox";
         public const string MessageFlowBoxExtraKey = "msgflowbox-extra";
@@ -18,7 +17,7 @@ namespace LiveRoku.Floating
         public const string Yellow = "Yellow";
         public const string Normal = "Normal";
 
-        public static string getText(TipsType type) {
+        public static string getText (TipsType type) {
             switch (type) {
                 case TipsType.Normal:
                     return Constant.Normal;
@@ -26,7 +25,8 @@ namespace LiveRoku.Floating
                     return Constant.Yellow;
                 case TipsType.Blue:
                     return Constant.Blue;
-                default: return string.Empty;
+                default:
+                    return string.Empty;
             }
         }
     }

@@ -3,7 +3,6 @@ using System.Windows;
 using LiveRoku.Base;
 using LiveRoku.Floating;
 
-
 namespace LiveRoku.Plugin {
     public class FloatingPlugin : LiveProgressBinderBase, IPlugin, ILogHandler, IStatusBinder {
         //private FloatingBox box;

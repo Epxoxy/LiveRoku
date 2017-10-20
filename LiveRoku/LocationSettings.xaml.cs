@@ -17,22 +17,22 @@ namespace LiveRoku {
     /// Interaction logic for LocationSettings.xaml
     /// </summary>
     public partial class LocationSettings : Window {
-        private string mfolder;
-        private string mfileName;
+        private string mFolder;
+        private string mFileName;
         public string Folder {
-            get { return folderBox == null ? mfolder : folderBox.Text; }
+            get { return folderBox == null ? mFolder : folderBox.Text; }
             set {
-                mfolder = value;
+                mFolder = value;
                 if (folderBox != null)
-                    folderBox.Text = mfolder;
+                    folderBox.Text = mFolder;
             }
         }
         public string FileName {
-            get { return fileNameBox == null ? mfileName : fileNameBox.Text; }
+            get { return fileNameBox == null ? mFileName : fileNameBox.Text; }
             set {
-                mfileName = value;
+                mFileName = value;
                 if (fileNameBox != null)
-                    fileNameBox.Text = mfileName;
+                    fileNameBox.Text = mFileName;
             }
         }
         private TextBox folderBox => folderTBox;
@@ -44,8 +44,8 @@ namespace LiveRoku {
 
         private void onLoaded (object sender, RoutedEventArgs e) {
             this.Loaded -= onLoaded;
-            folderBox.Text = mfolder;
-            fileNameBox.Text = mfileName;
+            folderBox.Text = mFolder;
+            fileNameBox.Text = mFileName;
         }
 
         private void changeBtnClick (object sender, RoutedEventArgs e) {

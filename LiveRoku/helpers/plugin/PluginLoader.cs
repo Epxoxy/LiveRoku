@@ -7,7 +7,7 @@ using System.Reflection;
 namespace LiveRoku {
     public class PluginLoader {
         public static List<T> LoadInstances<T> (string folder, IAssemblyCaches caches = null) {
-            if (!Directory.Exists(folder)) return null;
+            if (!Directory.Exists (folder)) return null;
             var plugins = new List<T> ();
             var paths = Directory.GetFiles (folder, "*.dll");
             foreach (var path in paths) {
@@ -17,7 +17,7 @@ namespace LiveRoku {
             }
             return plugins;
         }
-        
+
         public static T LoadInstance<T> (string path, IAssemblyCaches caches = null) {
             if (File.Exists (path) && path.EndsWith (".dll", true, null)) {
                 try {
@@ -45,7 +45,7 @@ namespace LiveRoku {
         }
 
         public static IEnumerable<Type> LoadTypesListImpl<T> (string folder, IAssemblyCaches caches = null) {
-            if (!Directory.Exists(folder)) return null;
+            if (!Directory.Exists (folder)) return null;
             var typesList = new List<Type> ();
             var paths = Directory.GetFiles (folder, "*.dll");
             foreach (var path in paths) {
@@ -69,7 +69,7 @@ namespace LiveRoku {
                     if (types == null || types.Length == 0)
                         return null;
                     var pluginType = typeof (T);
-                    return from type in types where pluginType.IsAssignableFrom(type) select type;
+                    return from type in types where pluginType.IsAssignableFrom (type) select type;
                 } catch (Exception e) {
                     System.Diagnostics.Debug.WriteLine (e.Message);
                     System.Diagnostics.Debug.WriteLine (e.StackTrace);
