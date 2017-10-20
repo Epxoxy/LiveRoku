@@ -1,3 +1,3 @@
 # LiveRoku
-Interface & Plugin
+Interface & Plugin.
 Add core dll to run it
