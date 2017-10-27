@@ -118,7 +118,7 @@ namespace LiveRoku {
             if(ctx != null) {
                 ctx.Fetcher?.stop();
                 ctx.Fetcher?.Dispose();
-                Parallel.ForEach(ctx.Plugins, plugin => {
+                ctx.Plugins.ForEach(plugin => {
                     Utils.runSafely(() => plugin.onDetach(ctx));
                 });
                 //assign settings
