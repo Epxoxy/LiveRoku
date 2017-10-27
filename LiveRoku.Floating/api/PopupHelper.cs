@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 
-namespace LiveRoku.Floating.helpers {
+namespace LiveRoku.Notifications.helpers {
     public class PopupHelper {
         //To control location before Popup's IsOpen property changed
         //Use this means you can't change Popup's IsOpen property by youself
@@ -16,10 +16,10 @@ namespace LiveRoku.Floating.helpers {
             obj.SetValue (VisibleProperty, value);
         }
         //Help log value that location changed when IsInView property changed
-        public static LocationSettings GetSettings (DependencyObject obj) {
-            return (LocationSettings) obj.GetValue (SettingsProperty);
+        public static WidgetSettings GetSettings (DependencyObject obj) {
+            return (WidgetSettings) obj.GetValue (SettingsProperty);
         }
-        public static void SetSettings (DependencyObject obj, LocationSettings value) {
+        public static void SetSettings (DependencyObject obj, WidgetSettings value) {
             obj.SetValue (SettingsProperty, value);
         }
         //Make Popup become dragable by listen 'PreviewMouseLeftButtonDown' Event
@@ -36,16 +36,16 @@ namespace LiveRoku.Floating.helpers {
         public static void SetTopMost (DependencyObject obj, bool value) {
             obj.SetValue (TopMostProperty, value);
         }
-
+        
         public static readonly DependencyProperty VisibleProperty =
             DependencyProperty.RegisterAttached ("Visible", typeof (bool), typeof (PopupHelper), new PropertyMetadata (false, onVisibleChanged));
         public static readonly DependencyProperty SettingsProperty =
-            DependencyProperty.RegisterAttached ("Settings", typeof (LocationSettings), typeof (PopupHelper), new PropertyMetadata (null));
+            DependencyProperty.RegisterAttached ("Settings", typeof (WidgetSettings), typeof (PopupHelper), new PropertyMetadata (null));
         public static readonly DependencyProperty DraggableProperty =
             DependencyProperty.RegisterAttached ("Draggable", typeof (bool), typeof (PopupHelper), new PropertyMetadata (false, onDraggableChanged));
         public static readonly DependencyProperty TopMostProperty =
             DependencyProperty.RegisterAttached ("TopMost", typeof (bool), typeof (PopupHelper), new PropertyMetadata (true, onTopMostChanged));
-
+        
         //Callback on 'Draggable' property changed
         private static void onDraggableChanged (DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var element = d as Control;
@@ -65,13 +65,14 @@ namespace LiveRoku.Floating.helpers {
                 if ((bool) e.NewValue) {
                     if (!popup.IsOpen) popup.IsOpen = true;
                     //Set location
-                    if (settings == null) { settings = new LocationSettings (); SetSettings (d, settings); } else {
-                        setAlwaysOnTop (popup, settings.OnTop);
+                    if (settings == null) { settings = new WidgetSettings (); SetSettings (d, settings); }
+                    else {
                         setPopupLocation (popup, (int) settings.XOffset, (int) settings.YOffset);
+                        setAlwaysOnTop(popup, settings.OnTop);
                     }
                 } else {
                     //Log location
-                    if (settings == null) { settings = new LocationSettings (); SetSettings (d, settings); }
+                    if (settings == null) { settings = new WidgetSettings (); SetSettings (d, settings); }
                     var point = getPopupLocation (popup);
                     settings.XOffset = point.X;
                     settings.YOffset = point.Y;
@@ -79,10 +80,10 @@ namespace LiveRoku.Floating.helpers {
                 }
             }
         }
-        public static LocationSettings getUpdatedLocation (Popup popup) {
+        public static WidgetSettings getUpdatedLocation (Popup popup) {
             var settings = GetSettings (popup);
             if (settings == null) {
-                settings = new LocationSettings ();
+                settings = new WidgetSettings ();
                 SetSettings (popup, settings);
             }
             var point = getPopupLocation (popup);
@@ -96,7 +97,7 @@ namespace LiveRoku.Floating.helpers {
             if (popup != null) {
                 var settings = GetSettings (d);
                 if (settings == null) {
-                    settings = new LocationSettings ();
+                    settings = new WidgetSettings ();
                     SetSettings (d, settings);
                 }
                 settings.OnTop = (bool) e.NewValue;

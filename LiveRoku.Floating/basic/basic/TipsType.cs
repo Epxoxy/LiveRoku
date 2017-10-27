@@ -1,4 +1,4 @@
-﻿namespace LiveRoku.Floating {
+﻿namespace LiveRoku.Notifications {
     public enum TipsType {
         Normal,
         Yellow,

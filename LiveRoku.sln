@@ -1,19 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRoku", "LiveRoku\LiveRoku.csproj", "{FA861330-DCED-4E5D-8310-7A87254C211D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRoku.Floating", "LiveRoku.Floating\LiveRoku.Floating.csproj", "{454FC7A4-2F7E-461A-9210-225E36FC0A11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRoku.Plugins.Notifications", "LiveRoku.Floating\LiveRoku.Plugins.Notifications.csproj", "{454FC7A4-2F7E-461A-9210-225E36FC0A11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRoku.Floating.Test", "LiveRoku.Floating.Test\LiveRoku.Floating.Test.csproj", "{5E4549C3-94F2-41CE-A747-43F768EBD30F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRoku.Plugins.Notifications.Test", "LiveRoku.Floating.Test\LiveRoku.Plugins.Notifications.Test.csproj", "{5E4549C3-94F2-41CE-A747-43F768EBD30F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRoku.StateFix", "LiveRoku.StateFix\LiveRoku.StateFix.csproj", "{9D4CEE42-8D69-4C62-989F-FB7D3014FF12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveRoku.Plugins.StateFix", "LiveRoku.StateFix\LiveRoku.Plugins.StateFix.csproj", "{9D4CEE42-8D69-4C62-989F-FB7D3014FF12}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{0896FFC2-9427-43C6-A700-C84FC532E183}"
 	ProjectSection(SolutionItems) = preProject
 		libs\LiveRoku.Base.dll = libs\LiveRoku.Base.dll
+		libs\LiveRoku.Loader.dll = libs\LiveRoku.Loader.dll
 	EndProjectSection
 EndProject
 Global

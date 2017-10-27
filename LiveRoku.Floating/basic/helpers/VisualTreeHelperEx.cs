@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     static class VisualTreeHelperEx {
         public static T GetVisualChild<T> (this DependencyObject parent) where T : DependencyObject {
             T child = default (T);

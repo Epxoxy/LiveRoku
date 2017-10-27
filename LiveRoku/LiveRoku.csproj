@@ -49,6 +49,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\LiveRoku.Base.dll</HintPath>
     </Reference>
+    <Reference Include="LiveRoku.Loader">
+      <HintPath>..\libs\LiveRoku.Loader.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -79,11 +82,6 @@
     <Compile Include="helpers\Constant.cs" />
     <Compile Include="helpers\debugex\DebugHelper.cs" />
     <Compile Include="helpers\debugex\LogTraceListener.cs" />
-    <Compile Include="helpers\plugin\IAssemblyCaches.cs" />
-    <Compile Include="helpers\plugin\PluginLoader.cs" />
-    <Compile Include="storage\FileHelper.cs" />
-    <Compile Include="storage\SerializeHelper.cs" />
-    <Compile Include="storage\StorageHelper.cs" />
     <Compile Include="helpers\TextBoxHelper.cs" />
     <Compile Include="ui\controls\DelayFitSizeWrapper.cs" />
     <Compile Include="ui\controls\dependency\PlaceHolder.cs" />

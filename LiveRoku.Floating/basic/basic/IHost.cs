@@ -1,8 +1,8 @@
-﻿namespace LiveRoku.Floating {
-    interface IHost {
+﻿namespace LiveRoku.Notifications {
+    interface IFloatingHost {
         void show ();
         void close ();
-        void saveSettings ();
+        void putSettingsTo (Base.ISettings settings);
         void addMessage (string tag, string msg);
         void updateTips (TipsType level, string tips);
         void updateSizeText (string text);

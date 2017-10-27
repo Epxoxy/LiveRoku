@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     internal class MessageWrapper<T> {
         public bool RecentEnabled { get; private set; } = true;
         public bool FlowEnabled { get; private set; } = true;
@@ -44,6 +44,7 @@ namespace LiveRoku.Floating {
             }
             recentAdded.Invoke ();
         }
+
 
         public void setEnable (bool enabled, bool clearOnDisabled = true) {
             this.FlowEnabled = enabled;

@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 //see https://stackoverflow.com/questions/136435/any-way-to-make-a-wpf-textblock-selectable
 //answer by @torvin
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     class TextEditorWrapper {
         private static readonly Type TextEditorType = Type.GetType ("System.Windows.Documents.TextEditor, PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
         private static readonly PropertyInfo IsReadOnlyProp = TextEditorType.GetProperty ("IsReadOnly", BindingFlags.Instance | BindingFlags.NonPublic);

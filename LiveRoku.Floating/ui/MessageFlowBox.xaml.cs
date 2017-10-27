@@ -1,78 +1,97 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using LiveRoku.Floating.helpers;
+using LiveRoku.Notifications.helpers;
+using System.Windows.Threading;
+using System.Threading;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     /// <summary>
     /// Interaction logic for MessageFlowBox.xaml
     /// </summary>
-    public partial class MessageFlowBox : Window, IHost {
-        private Base.IStorage storage;
+    public partial class MessageFlowBox : Window, IFloatingHost {
         private FlowAnimationWrapper animator;
         private ScrollViewer recentHost;
         private MessageWrapper<MessageBean> msgHost;
-        private Dictionary<string, object> extra;
 
-        public MessageFlowBox (Base.IStorage storage) {
-            this.storage = storage;
+        public MessageFlowBox (Base.ISettings settings) {
             InitializeComponent ();
+            subscribeEvent(settings);
+        }
+
+        public void putSettingsTo (Base.ISettings settings) {
+            if (settings == null) return;
+            var location = Dispatcher.Invoke(() => {
+                return PopupHelper.getUpdatedLocation(popbox);
+            });
+            var flowChecked = Dispatcher.Invoke(() => flowToggle.IsChecked == true);
+            location.relativeTo(SystemParameters.WorkArea);
+            settings.put(Constant.MessageFlowBoxKey, location);
+            settings.put(Constant.MsgFlowCheckedKey, flowChecked);
+            settings.put(Constant.MaxRecentKey, msgHost.MaxRecentSize);
+        }
+
+        private void subscribeEvent(Base.ISettings settings) {
+            RoutedEventHandler onLoaded = null;
+            onLoaded = (sender, e) => {
+                this.Loaded -= onLoaded;
+                if (Owner != null) Owner.Closing += onOwnerClosing;
+                this.Top = 0;
+                this.Hide();
+                setPopup(settings);
+                setFlow(settings);
+            };
             this.Loaded += onLoaded;
         }
 
-        private void onLoaded (object sender, RoutedEventArgs e) {
-            this.Loaded -= onLoaded;
-            this.Top = 0;
-            this.Hide ();
-            this.Owner.Closing += onOwnerClosing;
-            this.popbox.Closed += reopenOnUnexpectedlyClosed;
+        private void setPopup(Base.ISettings settings) {
+            popbox.Closed += reopenOnUnexpectedlyClosed;
             //get settings from storage
             //get extra from storage
-            LocationSettings settings = null;
-            storage?.tryGet (Constant.MessageFlowBoxKey, out settings);
-            storage?.tryGet (Constant.MessageFlowBoxExtraKey, out extra);
-            settings = LocationSettings.getValid (settings ?? new LocationSettings (), SystemParameters.WorkArea);
-            extra = extra ?? new Dictionary<string, object> ();
-            System.Diagnostics.Debug.WriteLine ($"Loading location {settings.XOffset},{settings.YOffset}");
+            var location = settings.get(Constant.MessageFlowBoxKey, new WidgetSettings());
+            location = WidgetSettings.match(location, SystemParameters.WorkArea);
+            System.Diagnostics.Debug.WriteLine($"Loading location {location.XOffset},{location.YOffset}");
             //set popup
-            PopupHelper.SetSettings (popbox, settings);
-            PopupHelper.SetVisible (popbox, true);
+            PopupHelper.SetSettings(popbox, location);
+            PopupHelper.SetVisible(popbox, true);
+        }
+        
+        private void setFlow (Base.ISettings settings) {
             //set flow message source & recent message source
-            var flowMsgs = new BindingList<MessageBean> ();
-            var recentMsgs = new BindingList<MessageBean> ();
-            flowItems.ItemsSource = flowMsgs;
-            recentItems.ItemsSource = recentMsgs;
-            animator = new FlowAnimationWrapper (flowItems.GetVisualChild<ScrollViewer> (), flowMsgs);
+            var msgFlowList = new BindingList<MessageBean> ();
+            var recentMsgList = new BindingList<MessageBean> ();
+            flowItems.ItemsSource = msgFlowList; 
+            recentItems.ItemsSource = recentMsgList;
+            animator = new FlowAnimationWrapper (flowItems.GetVisualChild<ScrollViewer> (), msgFlowList);
             //set message host
-            msgHost = new MessageWrapper<MessageBean> (flowMsgs, recentMsgs, msg => {
+            var maxRecent = settings.get(Constant.MaxRecentKey, 60);
+            msgHost = new MessageWrapper<MessageBean> (msgFlowList, recentMsgList, msg => {
                 return new MessageBean (msg.Tag, msg.Content) { Extra = $"[{DateTime.Now.ToString("HH:mm:ss fff")}]" };
-            }, 60);
+            }, Math.Max(maxRecent, 60));
             msgHost.onMessageAddedDo (() => animator.raiseAnimated ());
             //must set it after because of flowToggle control flowItems's visibility
             //which may case flowItems.GetVisualChild<T> return null
-            if (extra.TryGetValue (Constant.MsgFlowCheckedKey, out object enabled) &&
-                enabled != null && enabled is bool) {
-                flowToggle.IsChecked = (bool) enabled;
-                onFlowEnableChanged ((bool) enabled);
-            } else extra.Add (Constant.MsgFlowCheckedKey, true);
+            var enabled = settings.get(Constant.MsgFlowCheckedKey, true);
+            flowToggle.IsChecked = (bool)enabled;
+            onFlowEnableChanged((bool)enabled);
         }
 
         private void reopenOnUnexpectedlyClosed (object sender, EventArgs e) {
             if (!this.IsEnabled) return;
             //Keep open on unexpectedly closed
             Task.Run (() => {
-                popbox.Dispatcher.Invoke (() => {
+                invokeSafely(popbox.Dispatcher, () => {
                     popbox.IsOpen = true;
                 });
             });
         }
 
         private void onOwnerClosing (object sender, CancelEventArgs e) {
-            this.Owner.Closing -= onOwnerClosing;
+            if(Owner!= null)
+                Owner.Closing -= onOwnerClosing;
             this.popbox.Closed -= reopenOnUnexpectedlyClosed;
         }
 
@@ -93,42 +112,33 @@ namespace LiveRoku.Floating {
 
         //interface part
         public void show () {
-            this.Show ();
+            invokeSafely(Dispatcher, () => Show());
         }
 
         public void close () {
-            this.Close ();
+            invokeSafely(Dispatcher, ()=> Close ());
         }
-
-        public void saveSettings () {
-            if (storage == null) return;
-            var settings = PopupHelper.getUpdatedLocation (popbox);
-            extra[Constant.MsgFlowCheckedKey] = flowToggle.IsChecked == true;
-            storage.add (Constant.MessageFlowBoxKey, settings);
-            storage.add (Constant.MessageFlowBoxExtraKey, extra);
-            storage.save ();
-        }
-
+        
         public void addMessage (string tag, string msg) {
-            Dispatcher.Invoke (() => {
+            invokeSafely(Dispatcher, () => {
                 var alreayBottom = false;
                 if (msgHost.RecentEnabled) {
-                    recentHost = recentHost ?? recentItems.GetVisualChild<ScrollViewer> ();
-                    alreayBottom = recentHost != null && recentHost.IsScrolledToBottom (2);
+                    recentHost = recentHost ?? recentItems.GetVisualChild<ScrollViewer>();
+                    alreayBottom = recentHost != null && recentHost.IsScrolledToBottom(2);
                 }
-                msgHost.addMessage (new MessageBean (tag, msg));
+                msgHost.addMessage(new MessageBean(tag, msg));
                 if (alreayBottom) {
-                    recentHost.ScrollToBottom ();
+                    recentHost.ScrollToBottom();
                 }
             });
         }
 
         public void updateStatus (bool isOn) {
-            Dispatcher.Invoke (() => this.statusEle.Text = isOn ? "ON" : "OFF");
+            invokeSafely(Dispatcher, () => this.statusEle.Text = isOn ? "ON" : "OFF");
         }
 
         public void updateTips (TipsType level, string tips) {
-            Dispatcher.Invoke (() => {
+            invokeSafely(Dispatcher, () => {
                 //Get next state
                 string stateName = Constant.getText (level);
                 if (string.IsNullOrEmpty (stateName)) return;
@@ -137,7 +147,7 @@ namespace LiveRoku.Floating {
         }
 
         public void updateSizeText (string text) {
-            Dispatcher.Invoke (() => { sizeTb.Text = text; });
+            invokeSafely(Dispatcher, () => { sizeTb.Text = text; });
         }
 
         public void onClick (Action onClick) { }
@@ -176,6 +186,12 @@ namespace LiveRoku.Floating {
         private void onFlowEnableChanged (bool enabled) {
             msgHost?.setEnable (enabled);
             animator?.setIsEnabled (enabled);
+        }
+
+        private void invokeSafely (Dispatcher dispatcher, Action action) {
+            if (Thread.CurrentThread == dispatcher.Thread) {
+                action.Invoke();
+            } else dispatcher.BeginInvoke (DispatcherPriority.Normal, action);
         }
     }
 }

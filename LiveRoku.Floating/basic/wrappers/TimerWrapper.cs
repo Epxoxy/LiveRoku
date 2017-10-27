@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace LiveRoku.Floating.helpers {
+namespace LiveRoku.Notifications.helpers {
     internal class TimerWrapper : IDisposable {
         private Timer timer;
         public bool IsRunning { get; private set; }

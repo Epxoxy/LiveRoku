@@ -10,12 +10,9 @@ namespace LiveRoku {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application, IAssemblyCaches {
+    public partial class App : Application {
         //Basic path below
         public static readonly string baseFolder = AppDomain.CurrentDomain.BaseDirectory;
-        public static readonly string dataFolder = baseFolder + "data";
-        public static readonly string pluginFolder = baseFolder + "plugins";
-        public static readonly string coreFolder = baseFolder + "core";
         private static readonly string debugFolder = baseFolder + "debug";
         private static readonly string debugPath = debugFolder + "\\debug.txt";
         private Dictionary<string, Assembly> assemblyCache;
@@ -28,40 +25,7 @@ namespace LiveRoku {
             System.Diagnostics.Trace.Listeners.Add (logTracker);
             DispatcherUnhandledException += onDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += outputException;
-            AppDomain.CurrentDomain.AssemblyResolve += findCache;
-            AppDomain.CurrentDomain.AssemblyLoad += cacheAssembly;
         }
-
-        #region Assembly help
-
-        public bool tryGet (string fullName, out Assembly assembly) {
-            assembly = null;
-            if (assemblyCache.ContainsKey (fullName)) {
-                assembly = assemblyCache[fullName];
-            }
-            if (assembly == null)
-                return false;
-            return true;
-        }
-
-        private void cacheAssembly (object sender, AssemblyLoadEventArgs args) {
-            var assembly = args.LoadedAssembly;
-            if (assemblyCache.ContainsKey (assembly.FullName))
-                assemblyCache[assembly.FullName] = assembly;
-            else assemblyCache.Add (assembly.FullName, assembly);
-        }
-
-        private Assembly findCache (object sender, ResolveEventArgs args) {
-            if (assemblyCache.ContainsKey (args.Name))
-                return assemblyCache[args.Name];
-            return null;
-            // you may not want to use First() here, consider FirstOrDefault() as well
-            /*return  (from a in AppDomain.CurrentDomain.GetAssemblies ()
-                   where a.GetName ().FullName == args.Name
-                   select a).FirstOrDefault ();*/
-        }
-
-        #endregion
 
         #region Unexpected exception handler
 
@@ -143,7 +107,6 @@ namespace LiveRoku {
         private void purgeEvents () {
             DispatcherUnhandledException -= onDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException -= outputException;
-            AppDomain.CurrentDomain.AssemblyResolve -= findCache;
         }
 
         #endregion

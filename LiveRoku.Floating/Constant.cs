@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     public class Constant {
         public const string MessageFlowBoxKey = "msgflowbox";
         public const string MessageFlowBoxExtraKey = "msgflowbox-extra";
         public const string FloatingboxKey = "floatingbox";
         public const string PopMsgKey = "popMsg";
         public const string MsgFlowCheckedKey = "msgFlowChecked";
+        public const string MaxRecentKey = "maxRecent";
         public const string Expand = "Expand";
         public const string Collapsed = "Collapsed";
         public const string Blue = "Blue";

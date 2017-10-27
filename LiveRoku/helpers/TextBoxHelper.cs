@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace LiveRoku {
     public class TextBoxHelper {
         public static readonly DependencyProperty IsClearButtonProperty =
-            DependencyProperty.RegisterAttached ("IsClearButton", typeof (bool), typeof (TextBoxHelper), new PropertyMetadata (false, setForClearText));
+            DependencyProperty.RegisterAttached ("IsClearButton", typeof (bool), typeof (TextBoxHelper), new PropertyMetadata (false, setEventHandler));
 
         public static bool GetIsClearButton (DependencyObject obj) {
             return (bool) obj.GetValue (IsClearButtonProperty);
@@ -30,7 +25,7 @@ namespace LiveRoku {
         public static readonly DependencyProperty ClearTargetProperty =
             DependencyProperty.RegisterAttached ("ClearTarget", typeof (TextBox), typeof (TextBoxHelper), new PropertyMetadata (null));
 
-        private static void setForClearText (DependencyObject d, DependencyPropertyChangedEventArgs e) {
+        private static void setEventHandler (DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var btn = d as Button;
             if (d != null && e.OldValue != e.NewValue) {
                 btn.Click -= clearText;

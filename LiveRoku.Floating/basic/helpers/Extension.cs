@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     public static class Extends {
         public static bool IsScrolledToBottom (this IScrollInfo scrollInfo, double offset = 0) {
             return scrollInfo.VerticalOffset + scrollInfo.ViewportHeight + offset >= scrollInfo.ExtentHeight;

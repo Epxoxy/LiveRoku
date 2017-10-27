@@ -1,4 +1,4 @@
-﻿namespace LiveRoku.Floating {
+﻿namespace LiveRoku.Notifications {
     internal class MessageBean {
         public string Tag { get; set; }
         public string Content { get; set; }

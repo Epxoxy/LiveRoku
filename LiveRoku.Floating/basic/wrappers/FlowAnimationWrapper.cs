@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     internal class FlowAnimationWrapper {
         private CancellationTokenSource cts;
         private volatile bool animating;
@@ -38,8 +38,8 @@ namespace LiveRoku.Floating {
                 KeyTime = slowTime
             };
             var timeline = new DoubleAnimationUsingKeyFrames ();
-            timeline.KeyFrames.Add (fromFrame);
-            timeline.KeyFrames.Add (toFrame);
+            timeline.KeyFrames.Add (fromFrame); 
+            timeline.KeyFrames.Add(toFrame);
             animated.Children.Add (timeline);
             animated.Completed += animatedGoOn;
             ScrollBinder.SetTarget (host, host);

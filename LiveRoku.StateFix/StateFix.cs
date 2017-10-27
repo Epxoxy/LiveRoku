@@ -2,13 +2,20 @@
 using System.Threading;
 using System.Threading.Tasks;
 using LiveRoku.Base;
+using LiveRoku.Base.Logger;
+using LiveRoku.Base.Plugin;
+using System.Diagnostics.CodeAnalysis;
 
-
-namespace StateFix {
-    public class StateFixPlugin : LiveProgressBinderBase, IPlugin, IStatusBinder {
-        public string Name => nameof (StateFixPlugin);
-        public string Description => nameof (StateFixPlugin);
-
+namespace LiveRoku.StateFix {
+    public class StateFix : LiveProgressBinderBase, IPlugin, IStatusBinder {
+        public string Token => typeof(StateFix).FullName;
+        public IPluginDescriptor Descriptor { get; } = new PluginDescriptor {
+            Name = nameof(StateFix),
+            Description = nameof(StateFix),
+            Version = "0.0.0.1",
+            Author = "epxoxy"
+        };
+        
         private ILiveFetcher fetcher;
         private DateTime lastDownloadTime;
         private CancellationTokenSource downloadTestCTS;
@@ -19,9 +26,10 @@ namespace StateFix {
         private long idleTime = 5000;
         private object locker = new object ();
         private Action runOnce;
+        private ISettings settings;
 
-        public void onAttach (ILiveFetcher fetcher) {
-            this.fetcher = fetcher;
+        public void onAttach (IPluginHost host) {
+            this.fetcher = host.Fetcher;
             this.fetcher.LiveProgressBinders.add (this);
             this.fetcher.StatusBinders.add (this);
             lastDownloadTime = DateTime.Now;
@@ -37,15 +45,19 @@ namespace StateFix {
             }
         }
 
-        public void onInitialize (IStorage storage) { }
-        public void onDetach () {
+        public void onInitialize (ISettings settings) {
+            this.settings = settings;
+        }
+        public void onDetach (IPluginHost host) {
             cancel (downloadTestCTS);
             if (idleTimer == null) return;
             idleTimer.Elapsed -= onElapsed;
         }
 
+        [SuppressMessage("Microsoft.Performance", "CS4014")]
         private void downloadTest () {
             cancel (downloadTestCTS);
+            if (!settings.get("cancel-flv", true)) return;
             downloadTestCTS = new CancellationTokenSource ();
             Task.Run (async () => {
                 while (true) {
@@ -53,12 +65,12 @@ namespace StateFix {
                     await Task.Delay (10000, downloadTestCTS.Token);
                     //Check time pass from last download
                     var pastMs = getDifferToNow (lastDownloadTime);
-                    fetcher.Logger.log (Level.Info, $"@DownloadTest. Start test pastMs is {pastMs / 1000 d}s");
+                    fetcher.Logger.log (Level.Info, $"@DownloadTest. Start test pastMs is {pastMs / (double)1000 }s");
                     if (pastMs < 1000) {
                         break;
                     }
                     //Check if the live is on
-                    var info = fetcher.fetchRoomInfo (true);
+                    var info = fetcher.getRoomInfo (true);
                     fetcher.Logger.log (Level.Info, $"@DownloadTest. Start test Room.IsOn is {info.IsOn}");
                     //If live off or download already started.
                     if (!info.IsOn) {
@@ -73,8 +85,10 @@ namespace StateFix {
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
+        [SuppressMessage("Microsoft.Performance", "CS4014")]
         private void streamTest () {
             cancel (streamTestCTS);
+            if (settings.get("cancel-flv", false)) return;
             streamChecking = false;
             streamTestCTS = new CancellationTokenSource ();
             Task.Run (async () => {
@@ -87,14 +101,13 @@ namespace StateFix {
                         continue;
                     }
                     //Check if live off
-                    var info = fetcher.fetchRoomInfo (true);
+                    var info = fetcher.getRoomInfo(true);
                     fetcher.Logger.log (Level.Info, $"@SteamTest. Room.IsOn is {info.IsOn}");
                     if (!info.IsOn) {
                         break;
                     }
                     //Check streaming one more time
-                    pastMs = getDifferToNow (lastDownloadTime);
-                    if (pastMs < 10000) {
+                    if ((pastMs = getDifferToNow(lastDownloadTime)) < 10000) {
                         continue;
                     }
                     //Cancel if need
@@ -128,13 +141,13 @@ namespace StateFix {
         }
 
         private void cancel (CancellationTokenSource src) {
-            if (src != null && src.Token.CanBeCanceled) {
+            if (src?.Token.CanBeCanceled == true) {
                 src.Cancel ();
             }
         }
 
         public override void onStatusUpdate (bool isOn) {
-            if (isOn) downloadTest ();
+            if (isOn && !settings.get("cancel-flv", false)) downloadTest ();
             else idleTimer?.Stop ();
         }
 

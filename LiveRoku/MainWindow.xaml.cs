@@ -12,13 +12,14 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using LiveRoku.Base;
 using LiveRoku.UI;
-
+using LiveRoku.Base.Logger;
+using LiveRoku.Loader;
 
 namespace LiveRoku {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, ILogHandler, IFetchSettings, ILiveProgressBinder, IStatusBinder {
+    public partial class MainWindow : Window, ILogHandler, IFetchArgsHost, ILiveProgressBinder, IStatusBinder {
         #region ------- UIElements proxy -----------
         //--------------------------------------
         //PART A : UIElements for IConfigHolder
@@ -60,12 +61,12 @@ namespace LiveRoku {
         public string FileFormat => Dispatcher.invokeSafely (() => settings.DownloadFileFormat);
         public bool DownloadDanmaku => Dispatcher.invokeSafely (() => saveDanmaku.IsChecked == true);
         public bool AutoStart => Dispatcher.invokeSafely (() => autoStart.IsChecked == true);
+        public string UserAgent => string.Empty;
 
         //Helpers
         private MySettings settings;
-        private IStorage storage;
-        private List<IPlugin> plugins;
-        private ILiveFetcher fetcher;
+        private LoadManager mgr;
+        private LoadContext ctx;
 
         public MainWindow () {
             InitializeComponent ();
@@ -78,81 +79,62 @@ namespace LiveRoku {
             stoppedSymbol = FindResource (Constant.PauseSymbolKey) as UIElement;
             startedSymbol = FindResource (Constant.RightSymbolKey) as UIElement;
             waitingSymbol = FindResource (Constant.LoadingSymbolKey) as UIElement;
-            string loadError = null;
-            bool coreLoaded = tryInitCore (ref fetcher, ref loadError, App.coreFolder, App.instance, this, "");
-            //Load plugins first, safely load all assembly
-            //Let storage deserialize method can find assembly right.
-            if (coreLoaded) {
-                plugins = PluginLoader.LoadInstances<IPlugin> (App.pluginFolder, App.instance);
-            } else {
-                Task.Run (() => { MessageBox.Show (loadError, "Error"); });
+            mgr = new LoadManager(AppDomain.CurrentDomain.BaseDirectory);
+            LoadContextBase ctxBase = null;
+            try {
+                ctxBase = mgr.initCtxBase();
+                var mArgs = ctxBase.AppLocalData.getAppSettings().get("Args", new MySettings());
+                this.settings = mArgs;
+                initSettings(mArgs);
+            } catch(Exception ex) {
+                Task.Run (() => { MessageBox.Show (ex.Message, "Error"); });
             }
+            this.settings = this.settings ?? new MySettings();
+            var coreLoaded = ctxBase?.LoadOk == true;
             //Subscribe basic events
             Dispatcher.invokeSafely (() => purgeEvents (resubscribe : true, justBasicEvent: !coreLoaded));
-            //Get settings
-            storage = Storage.StorageHelper.instance (App.dataFolder);
-            findSettings ();
-            //Load plugins
-            if (coreLoaded) {
-                for (int i = 0; i < plugins.Count; i++) {
-                    var typeName = plugins[i].GetType ().Name;
-                    if (!settings.Plugins.ContainsKey (typeName)) {
-                        settings.Plugins.Add (typeName, true);
-                    } else if (!settings.Plugins[typeName]) {
-                        plugins.Remove (plugins[i]);
-                        System.Diagnostics.Debug.WriteLine ("remove " + typeName);
-                    } else {
-                        settings.Plugins[typeName] = true;
-                    }
-                }
-                if (settings.Extras != null && settings.Extras.Count > 0) {
-                    foreach (var key in settings.Extras.Keys) {
-                        fetcher.putExtra (key, settings.Extras[key]);
-                    }
-                }
-                plugins.forEachSafely (p => {
-                    p.onInitialize (storage);
-                    fetcher.Logger.log (Level.Info, $"{p.GetType().Name} loaded.");
-                });
-                //Generate helpers
-                //downloader = new LiveDownloader(this, "");
-                fetcher.Logger.LogHandlers.add (this);
-                fetcher.LiveProgressBinders.add (this);
-                fetcher.StatusBinders.add (this);
-                plugins.forEachSafely (p => p.onAttach (fetcher));
+            try {
+                if (!coreLoaded || (ctx = mgr.create(this)) == null) return;
+            } catch(Exception ex) {
+                Task.Run (() => { MessageBox.Show (ex.Message, "Error"); });
             }
+            ctx.Fetcher.Logger.LogHandlers.add(this);
+            ctx.Fetcher.LiveProgressBinders.add(this);
+            ctx.Fetcher.StatusBinders.add(this);
+            ctx.Plugins.ForEach(plugin => {
+                Utils.runSafely(() => {
+                    plugin.onInitialize(ctx.AppLocalData.getAppSettings());
+                    ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} loaded.");
+                });
+                Utils.runSafely(() => {
+                    plugin.onAttach(ctx);
+                    ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} Attach.");
+                });
+            });
         }
 
         protected override void OnClosing (CancelEventArgs e) {
             purgeEvents ();
-            fetcher?.Dispose ();
-            plugins?.forEachSafely (p => p.onDetach ());
-            saveSettings ();
+            if(ctx != null) {
+                ctx.Fetcher?.stop();
+                ctx.Fetcher?.Dispose();
+                Parallel.ForEach(ctx.Plugins, plugin => {
+                    Utils.runSafely(() => plugin.onDetach(ctx));
+                });
+                //assign settings
+                if (int.TryParse(RoomId, out int roomId)) {
+                    settings.addLastRoomId(roomId);
+                }
+                settings.AutoStart = AutoStart;
+                settings.DownloadDanmaku = DownloadDanmaku;
+                //save data
+                ctx.AppLocalData.getAppSettings().put("Args", this.settings);
+                ctx.saveAppData();
+            }
             base.OnClosing (e);
         }
-
-        private bool tryInitCore (ref ILiveFetcher fetcher, ref string error, string folder, IAssemblyCaches assembly, IFetchSettings settings, string userAgent) {
-            //Load core dll
-            var types = PluginLoader.LoadTypesListImpl<ILiveFetcher> (folder, assembly);
-            try {
-                object instance;
-                if (types == null || types.Count () <= 0 ||
-                    (instance = Activator.CreateInstance (types.First (), settings, userAgent)) == null ||
-                    (fetcher = instance as ILiveFetcher) == null) {
-                    error = types == null ? "Core dll not exist." : "Load core dll fail.";
-                } else return true;
-            } catch (Exception ex) {
-                ex.printStackTrace ();
-                error = "Load core error, msg : " + ex.Message;
-            }
-            return false;
-        }
-
-        private void findSettings () {
-            //Load settings
-            if (!storage.tryGet<MySettings> ("settings", out settings)) {
-                settings = new MySettings ();
-            }
+        
+        private void initSettings (MySettings settings) {
             Dispatcher.invokeSafely (() => {
                 roomIdBox.Text = settings.LastRoomId.ToString ();
                 saveDanmaku.IsChecked = settings.DownloadDanmaku;
@@ -160,19 +142,7 @@ namespace LiveRoku {
                 locationBox.Text = System.IO.Path.Combine (Folder, FileFormat);
             });
         }
-
-        private void saveSettings () {
-            if (settings == null || storage == null) return;
-            int roomId = 0;
-            if (int.TryParse (RoomId, out roomId)) {
-                settings.addLastRoomId (roomId);
-            }
-            settings.AutoStart = AutoStart;
-            settings.DownloadDanmaku = DownloadDanmaku;
-            storage.add ("settings", settings);
-            storage.save ();
-        }
-
+        
         //Part for controlling progress
         //Subscribe function like start, about,set/explore location
         #region -------------- event handlers --------------
@@ -200,10 +170,10 @@ namespace LiveRoku {
         }
 
         private void startOrStop (object sender, RoutedEventArgs e) {
-            if (fetcher == null) return;
-            if (fetcher.IsRunning)
-                fetcher.stop ();
-            else fetcher.start ();
+            if (ctx.Fetcher == null) return;
+            if (ctx.Fetcher.IsRunning)
+                ctx.Fetcher.stop ();
+            else ctx.Fetcher.start ();
         }
 
         private void setLocation (object sender, RoutedEventArgs e) {
@@ -241,7 +211,7 @@ namespace LiveRoku {
 
         private void updateTitleClick (object sender, RoutedEventArgs e) {
             Task.Run (() => {
-                var title = fetcher.fetchRoomInfo (true) ? .Title;
+                var title = ctx.Fetcher.getRoomInfo (true) ?.Title;
                 if (string.IsNullOrEmpty (title)) return;
                 Dispatcher.invokeSafely (() => titleView.Text = title);
             });
@@ -322,7 +292,7 @@ namespace LiveRoku {
 
         public void onStatusUpdate (bool on) {
             string tips = on ? Constant.LiveOnText : Constant.LiveOffText;
-            fetcher.Logger.log (Level.Info, "Now status is " + tips);
+            ctx.Fetcher.Logger.log (Level.Info, "Now status is " + tips);
             Dispatcher.invokeSafely (() => { statusOfLiveView.Content = tips; });
         }
 
@@ -350,15 +320,12 @@ namespace LiveRoku {
     }
 
     static class Utils {
-
-        public static void forEachSafely<T> (this List<T> list, Action<T> action) {
-            list.ForEach (o => {
-                try {
-                    action.Invoke (o);
-                } catch (Exception e) {
-                    e.printStackTrace ();
-                }
-            });
+        public static void runSafely (Action doWhat) {
+            try {
+                doWhat?.Invoke ();
+            } catch (Exception e) {
+                System.Diagnostics.Debug.WriteLine (e.ToString ());
+            }
         }
 
         public static void able (this bool enable, params UIElement[] elements) {

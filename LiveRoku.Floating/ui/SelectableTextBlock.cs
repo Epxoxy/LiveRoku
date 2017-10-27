@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     public class SelectableTextBlock : TextBlock {
         static SelectableTextBlock () {
             FocusableProperty.OverrideMetadata (typeof (SelectableTextBlock), new FrameworkPropertyMetadata (true));

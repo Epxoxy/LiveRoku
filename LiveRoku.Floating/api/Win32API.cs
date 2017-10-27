@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace LiveRoku.Floating.helpers {
+namespace LiveRoku.Notifications.helpers {
     public class Win32API {
         [DllImport ("user32.dll", EntryPoint = "GetWindowLong")]
         public static extern long GetWindowLong (IntPtr hwnd, int nIndex);

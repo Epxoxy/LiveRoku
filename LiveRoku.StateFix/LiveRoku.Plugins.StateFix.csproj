@@ -7,8 +7,8 @@
     <ProjectGuid>{9D4CEE42-8D69-4C62-989F-FB7D3014FF12}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StateFix</RootNamespace>
-    <AssemblyName>StateFix</AssemblyName>
+    <RootNamespace>LiveRoku.StateFix</RootNamespace>
+    <AssemblyName>LiveRoku.StateFix</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StateFixPlugin.cs" />
+    <Compile Include="StateFix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

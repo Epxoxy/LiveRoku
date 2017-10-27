@@ -1,7 +1,7 @@
-﻿<Application x:Class="Plugin.Test.App"
+﻿<Application x:Class="LiveRoku.Notifications.Test.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Plugin.Test"
+             xmlns:local="clr-namespace:LiveRoku.Notifications.Test"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

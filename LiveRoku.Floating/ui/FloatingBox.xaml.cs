@@ -6,20 +6,23 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using LiveRoku.Floating.helpers;
+using LiveRoku.Notifications.helpers;
 
-namespace LiveRoku.Floating {
+namespace LiveRoku.Notifications {
     /// <summary>
     /// Interaction logic for FloatingBox.xaml
     /// </summary>
-    public partial class FloatingBox : Window, IHost {
-        private Base.IStorage storage;
-        public FloatingBox (Base.IStorage storage) {
+    public partial class FloatingBox : Window, IFloatingHost {
+        public FloatingBox (Base.ISettings settings) {
             InitializeComponent ();
             timer = TimerWrapper.wrap (() => {
                 Dispatcher.Invoke (() => viewMsgBoxState (false));
             }, 5000);
-            this.storage = storage;
+            RoutedEventHandler onLoaded = null;
+            onLoaded = (sender, e) => {
+                this.Loaded -= onLoaded;
+                onLoadedInternal(settings);
+            };
             this.Loaded += onLoaded;
         }
 
@@ -54,16 +57,17 @@ namespace LiveRoku.Floating {
         private bool isMouseDown;
         #endregion
 
-        public void saveSettings () {
-            if (storage == null) return;
-            var boxSettings = PopupHelper.getUpdatedLocation (mybox);
-            var popMsgSettings = getNewerSettings (popMsg);
-            storage.add (Constant.FloatingboxKey, boxSettings);
-            storage.add (Constant.PopMsgKey, popMsgSettings);
-            storage.save ();
+        public void putSettingsTo (Base.ISettings settings) {
+            if (settings == null) return;
+            var boxSettings = Dispatcher.Invoke(() => PopupHelper.getUpdatedLocation (mybox));
+            var popMsgSettings = Dispatcher.Invoke(() => getNewerSettings (popMsg));
+            boxSettings.relativeTo(SystemParameters.WorkArea);
+            popMsgSettings.relativeTo(SystemParameters.WorkArea);
+            settings.put(Constant.FloatingboxKey, boxSettings);
+            settings.put(Constant.PopMsgKey, popMsgSettings);
         }
 
-        private LocationSettings getNewerSettings (System.Windows.Controls.Primitives.Popup obj) {
+        private WidgetSettings getNewerSettings (System.Windows.Controls.Primitives.Popup obj) {
             if (PopupHelper.GetVisible (obj)) {
                 return PopupHelper.getUpdatedLocation (obj);
             }
@@ -72,22 +76,22 @@ namespace LiveRoku.Floating {
 
         #region Event subscribe
 
-        private void onLoaded (object sender, RoutedEventArgs e) {
-            this.Loaded -= onLoaded;
+        private void onLoadedInternal (Base.ISettings settings) {
             this.fadeMsg = FindResource ("fadeMsg") as Storyboard;
             this.fadeMsg.Completed += showNextMessage;
             this.WindowStartupLocation = WindowStartupLocation.Manual;
             this.Dispatcher.ShutdownStarted += saveConfig;
-            this.Owner.Closing += onOwnerClosing;
+            if (Owner != null)
+                Owner.Closing += onOwnerClosing;
             this.mybox.Closed += onUnexpectedlyClosed;
             this.Left = SystemParameters.WorkArea.Width;
             this.Top = 0;
             this.Hide ();
-            if (storage != null) {
-                storage.tryGet (Constant.FloatingboxKey, out LocationSettings boxSettings);
-                storage.tryGet (Constant.PopMsgKey, out LocationSettings popMsgSettings);
-                boxSettings = LocationSettings.getValid (boxSettings, SystemParameters.WorkArea);
-                popMsgSettings = LocationSettings.getValid (popMsgSettings, SystemParameters.WorkArea);
+            if (settings != null) {
+                var boxSettings = settings.get(Constant.FloatingboxKey, new WidgetSettings());
+                var popMsgSettings = settings.get(Constant.PopMsgKey, new WidgetSettings());
+                boxSettings = WidgetSettings.match (boxSettings, SystemParameters.WorkArea);
+                popMsgSettings = WidgetSettings.match (popMsgSettings, SystemParameters.WorkArea);
                 System.Diagnostics.Debug.WriteLine ($"Loading location {boxSettings.XOffset},{boxSettings.YOffset}");
                 System.Diagnostics.Debug.WriteLine ($"Loading location {popMsgSettings.XOffset},{popMsgSettings.YOffset}");
                 PopupHelper.SetSettings (mybox, boxSettings);
@@ -97,7 +101,8 @@ namespace LiveRoku.Floating {
         }
 
         private void onOwnerClosing (object sender, System.ComponentModel.CancelEventArgs e) {
-            this.Owner.Closing -= onOwnerClosing;
+            if(Owner != null)
+                Owner.Closing -= onOwnerClosing;
             this.mybox.Closed -= onUnexpectedlyClosed;
             timer?.Dispose ();
         }
@@ -201,11 +206,11 @@ namespace LiveRoku.Floating {
         }
 
         public void show () {
-            this.Show ();
+            Dispatcher.Invoke(() => Show ());
         }
 
         public void close () {
-            this.Close ();
+            Dispatcher.Invoke(() => Close());
         }
 
         #endregion

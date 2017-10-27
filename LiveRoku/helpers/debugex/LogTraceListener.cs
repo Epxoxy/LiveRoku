@@ -25,7 +25,7 @@ namespace LiveRoku {
         public void WriteToFileAndClear () {
             if (debugMsgBuilder.Length <= 0) return;
             try {
-                Storage.FileHelper.writeTxt (debugMsgBuilder.ToString (), path, true);
+                Loader.FileHelper.writeText (debugMsgBuilder.ToString (), path, true);
             } catch (Exception) { throw; }
             debugMsgBuilder.Clear ();
         }
