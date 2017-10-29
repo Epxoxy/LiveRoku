@@ -97,5 +97,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LiveRoku.Notifications\LiveRoku.Plugins.Notifications.csproj">
+      <Project>{454fc7a4-2f7e-461a-9210-225e36fc0a11}</Project>
+      <Name>LiveRoku.Plugins.Notifications</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
