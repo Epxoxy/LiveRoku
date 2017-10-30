@@ -14,15 +14,15 @@ namespace LiveRoku {
         //Basic path below
         public static readonly string baseFolder = AppDomain.CurrentDomain.BaseDirectory;
         private static readonly string debugFolder = baseFolder + "debug";
-        private static readonly string debugPath = debugFolder + "\\debug.txt";
         private Dictionary<string, Assembly> assemblyCache;
-        private LogTraceListener logTracker;
+        private LogDateTimeTraceListener logTracker;
         public static App instance;
         public App () {
             instance = this;
             assemblyCache = new Dictionary<string, Assembly> ();
-            logTracker = new LogTraceListener (debugPath, 2048);
+            logTracker = new LogDateTimeTraceListener (System.IO.Path.Combine(debugFolder, "debug.txt"));
             System.Diagnostics.Trace.Listeners.Add (logTracker);
+            System.Diagnostics.Trace.AutoFlush = true;
             DispatcherUnhandledException += onDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += outputException;
         }
@@ -46,61 +46,44 @@ namespace LiveRoku {
 
         private void LogExceptionInfo (Exception exception, string typeName = "Undefined Exception") {
             purgeEvents ();
-            var lb = new System.Text.StringBuilder ();
-            lb.AppendLine ("***************************");
-            lb.AppendLine ("--------- Begin  ---------");
-            lb.AppendLine ("--------------------------");
-            lb.AppendLine ();
-            lb.AppendLine (DateTime.Now.ToString ("yyyy-MM-dd HH:mm:ss ffff"));
-            lb.AppendLine ();
-            lb.AppendLine ("--------------------------");
-            lb.AppendLine ();
-            lb.AppendLine (typeName);
-            lb.AppendLine ();
-            lb.AppendLine ("[0].TargetSite");
-            lb.AppendLine (exception.TargetSite.ToString ());
-            lb.AppendLine ();
-            lb.AppendLine ("[1].StackTrace");
-            lb.AppendLine (exception.StackTrace);
-            lb.AppendLine ();
-            lb.AppendLine ("[2].Source");
-            lb.AppendLine (exception.Source);
-            lb.AppendLine ();
-            lb.AppendLine ("[3].Message");
-            lb.AppendLine (exception.Message);
-            lb.AppendLine ();
-            lb.AppendLine ("[4].HResult");
-            lb.AppendLine (exception.HResult.ToString ());
-            lb.AppendLine ();
+            var builder = new StringBuilder ()
+                .AppendLine ("***************************")
+                .AppendLine ("--------- Begin  ---------")
+                .AppendLine ("--------------------------").AppendLine ()
+                .AppendLine (DateTime.Now.ToString ("yyyy-MM-dd HH:mm:ss ffff")).AppendLine ()
+                .AppendLine ("--------------------------").AppendLine ()
+                .AppendLine (typeName).AppendLine ()
+                .AppendLine ("[0].TargetSite")
+                .AppendLine (exception.TargetSite.ToString ()).AppendLine ()
+                .AppendLine ("[1].StackTrace")
+                .AppendLine (exception.StackTrace).AppendLine ()
+                .AppendLine ("[2].Source")
+                .AppendLine (exception.Source).AppendLine ()
+                .AppendLine ("[3].Message")
+                .AppendLine (exception.Message).AppendLine ()
+                .AppendLine ("[4].HResult")
+                .AppendLine (exception.HResult.ToString ()).AppendLine ();
             if (exception.InnerException != null) {
-                lb.AppendLine ("--------------");
-                lb.AppendLine ("InnerException");
-                lb.AppendLine ("--------------");
-                lb.AppendLine ();
-                lb.AppendLine ("[5.0].TargetSite");
-                lb.AppendLine (exception.InnerException.TargetSite.ToString ());
-                lb.AppendLine ();
-                lb.AppendLine ("[5.1].StackTrace");
-                lb.AppendLine (exception.InnerException.StackTrace);
-                lb.AppendLine ();
-                lb.AppendLine ("[5.2].Source");
-                lb.AppendLine (exception.InnerException.Source);
-                lb.AppendLine ();
-                lb.AppendLine ("[5.3].Message");
-                lb.AppendLine (exception.InnerException.Message);
-                lb.AppendLine ();
-                lb.AppendLine ("[5.4].HResult");
-                lb.AppendLine (exception.InnerException.HResult.ToString ());
-                lb.AppendLine ();
+                builder.AppendLine ("--------------")
+                    .AppendLine ("InnerException")
+                    .AppendLine ("--------------").AppendLine ()
+                    .AppendLine ("[5.0].TargetSite")
+                    .AppendLine (exception.InnerException.TargetSite.ToString ()).AppendLine ()
+                    .AppendLine ("[5.1].StackTrace")
+                    .AppendLine (exception.InnerException.StackTrace).AppendLine ()
+                    .AppendLine ("[5.2].Source")
+                    .AppendLine (exception.InnerException.Source).AppendLine ()
+                    .AppendLine ("[5.3].Message")
+                    .AppendLine (exception.InnerException.Message).AppendLine ()
+                    .AppendLine ("[5.4].HResult")
+                    .AppendLine (exception.InnerException.HResult.ToString ()).AppendLine ();
             }
-            lb.AppendLine ("--------- End  ---------");
-            lb.AppendLine ();
+            builder.AppendLine ("--------- End  ---------").AppendLine ();
 
-            string logPath = debugFolder + "\\log.txt";
+            string logPath = System.IO.Path.Combine(debugFolder, "log.txt");
             using (var sw = new System.IO.StreamWriter (logPath, true, System.Text.Encoding.UTF8)) {
-                sw.Write (lb.ToString ());
+                sw.Write (builder.ToString ());
             }
-            logTracker.WriteToFileAndClear ();
         }
 
         //Is it need? I don't know
@@ -112,4 +95,15 @@ namespace LiveRoku {
         #endregion
     }
 
+    internal class LogDateTimeTraceListener : System.Diagnostics.TextWriterTraceListener {
+        public LogDateTimeTraceListener (string path) : base (path) { }
+
+        public override void WriteLine (string message, string category) {
+            base.WriteLine (string.Format ("[{0:yyyy-MM-dd HH:mm:ss.fff}] [{1}]: {2}", DateTime.Now, category, message.Replace ("\n", Environment.NewLine)));
+        }
+
+        public override void WriteLine (string message) {
+            base.WriteLine (string.Format ("[{0:yyyy-MM-dd HH:mm:ss.fff}] : {1}", DateTime.Now, message.Replace ("\n", Environment.NewLine)));
+        }
+    }
 }

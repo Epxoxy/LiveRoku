@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LiveRoku.Notifications {
+﻿namespace LiveRoku.Notifications {
     public class Constant {
         public const string MessageFlowBoxKey = "msgflowbox";
         public const string MessageFlowBoxExtraKey = "msgflowbox-extra";

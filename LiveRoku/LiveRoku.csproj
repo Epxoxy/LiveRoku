@@ -79,10 +79,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="helpers\Constant.cs" />
-    <Compile Include="helpers\debugex\DebugHelper.cs" />
-    <Compile Include="helpers\debugex\LogTraceListener.cs" />
-    <Compile Include="helpers\TextBoxHelper.cs" />
+    <Compile Include="Constant.cs" />
+    <Compile Include="ui\controls\TextBoxHelper.cs" />
     <Compile Include="ui\controls\DelayFitSizeWrapper.cs" />
     <Compile Include="ui\controls\dependency\PlaceHolder.cs" />
     <Compile Include="ui\controls\dependency\ScrollViewerAttach.cs" />
@@ -124,7 +122,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="helpers\MySettings.cs" />
+    <Compile Include="MySettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -158,6 +156,7 @@
   <ItemGroup>
     <Resource Include="appicon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

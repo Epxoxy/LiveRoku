@@ -1,8 +1,8 @@
-﻿using System.Windows;
-using LiveRoku.Base;
-using LiveRoku.Base.Plugin;
-using LiveRoku.Base.Logger;
-namespace LiveRoku.Notifications {
+﻿namespace LiveRoku.Notifications {
+    using System.Windows;
+    using LiveRoku.Base;
+    using LiveRoku.Base.Plugin;
+    using LiveRoku.Base.Logger;
     public class LevitatedUI : LiveProgressBinderBase, IPlugin, ILogHandler, IStatusBinder {
         public string Token => typeof(LevitatedUI).FullName;
         public IPluginDescriptor Descriptor { get; } = new PluginDescriptor {

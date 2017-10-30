@@ -1,12 +1,11 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using LiveRoku.Base;
-using LiveRoku.Base.Logger;
-using LiveRoku.Base.Plugin;
-using System.Diagnostics.CodeAnalysis;
-
-namespace LiveRoku.StateFix {
+﻿namespace LiveRoku.StateFix {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using LiveRoku.Base;
+    using LiveRoku.Base.Logger;
+    using LiveRoku.Base.Plugin;
+    using System.Diagnostics.CodeAnalysis;
     public class StateFix : StatusAndLiveProgressBinderBase, IPlugin {
         public string Token => typeof(StateFix).FullName;
         public IPluginDescriptor Descriptor { get; } = new PluginDescriptor {
