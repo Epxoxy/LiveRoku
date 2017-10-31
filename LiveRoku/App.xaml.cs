@@ -12,14 +12,11 @@ namespace LiveRoku {
     /// </summary>
     public partial class App : Application {
         //Basic path below
-        public static readonly string baseFolder = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string debugFolder = baseFolder + "debug";
-        private Dictionary<string, Assembly> assemblyCache;
+        private static readonly string debugFolder = AppDomain.CurrentDomain.BaseDirectory + "debug";
         private LogDateTimeTraceListener logTracker;
         public static App instance;
         public App () {
             instance = this;
-            assemblyCache = new Dictionary<string, Assembly> ();
             logTracker = new LogDateTimeTraceListener (System.IO.Path.Combine(debugFolder, "debug.txt"));
             System.Diagnostics.Trace.Listeners.Add (logTracker);
             System.Diagnostics.Trace.AutoFlush = true;

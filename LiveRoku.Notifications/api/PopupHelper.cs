@@ -80,6 +80,7 @@ namespace LiveRoku.Notifications.helpers {
                 }
             }
         }
+        
         public static WidgetSettings getUpdatedLocation (Popup popup) {
             var settings = GetSettings (popup);
             if (settings == null) {

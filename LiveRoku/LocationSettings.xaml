@@ -9,8 +9,8 @@
         mc:Ignorable="d"
         ShowInTaskbar="False"
         Background="White"
-        BorderThickness="0"
-        BorderBrush="White"
+        BorderThickness="0.7"
+        BorderBrush="LightGray"
         Title="SaveDialog" 
         ResizeMode="NoResize"
         Width="450" Height="320">

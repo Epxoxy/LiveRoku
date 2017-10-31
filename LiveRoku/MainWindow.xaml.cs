@@ -41,8 +41,8 @@ namespace LiveRoku {
         //--------------------------------------
         //PART C : UIElements for controlling process
         //--------------------------------------
-        private ButtonBase ctlBtn01 => startEndBtn01;
-        private ButtonBase ctlBtn02 => startEndBtn02;
+        private ButtonBase downloadCtl => startEndBtn01;
+        private ButtonBase downloadCtl2 => startEndBtn02;
 
         //--------------------------------------
         //PART D : Some resources
@@ -76,7 +76,7 @@ namespace LiveRoku {
         private void onLoaded (object sender, RoutedEventArgs e) {
             this.Loaded -= onLoaded;
             //Load basic resources
-            stoppedSymbol = FindResource (Constant.PauseSymbolKey) as UIElement;
+            stoppedSymbol = FindResource (Constant.StopSymbolKey) as UIElement;
             startedSymbol = FindResource (Constant.RightSymbolKey) as UIElement;
             waitingSymbol = FindResource (Constant.LoadingSymbolKey) as UIElement;
             mgr = new LoadManager(AppDomain.CurrentDomain.BaseDirectory);
@@ -151,16 +151,16 @@ namespace LiveRoku {
             exploreFolder2.MouseLeftButtonUp -= explore;
             aboutLink.MouseLeftButtonUp -= showAbout;
             editPathBtn.Click -= setLocation;
-            ctlBtn01.Click -= startOrStop;
-            ctlBtn02.Click -= startOrStop;
+            downloadCtl.Click -= startOrStop;
+            downloadCtl2.Click -= startOrStop;
             if (resubscribe) {
                 exploreFolder.MouseLeftButtonUp += explore;
                 exploreFolder2.MouseLeftButtonUp += explore;
                 aboutLink.MouseLeftButtonUp += showAbout;
                 editPathBtn.Click += setLocation;
                 if (!justBasicEvent) {
-                    ctlBtn01.Click += startOrStop;
-                    ctlBtn02.Click += startOrStop;
+                    downloadCtl.Click += startOrStop;
+                    downloadCtl2.Click += startOrStop;
                 }
             }
         }
@@ -229,37 +229,37 @@ namespace LiveRoku {
         #region ------------- implement IStatusBinder -------------
         public void onPreparing () {
             Dispatcher.invokeSafely (() => {
-                ctlBtn01.Content = Constant.PreparingText;
-                ctlBtn02.Content = waitingSymbol;
-                false.able (ctlBtn01, ctlBtn02, configViewRoot);
+                downloadCtl.Content = Constant.PreparingText;
+                downloadCtl2.Content = waitingSymbol;
+                false.able (downloadCtl, downloadCtl2, configViewRoot);
                 statusOfLiveView.Content = Constant.PreparingText;
             });
         }
 
         public void onWaiting () {
             Dispatcher.invokeSafely (() => {
-                ctlBtn01.Content = Constant.WaitingText;
-                ctlBtn02.Content = waitingSymbol;
+                downloadCtl.Content = Constant.WaitingText;
+                downloadCtl2.Content = waitingSymbol;
                 false.able (configViewRoot);
-                true.able (ctlBtn01, ctlBtn02);
+                true.able (downloadCtl, downloadCtl2);
                 statusOfLiveView.Content = Constant.WaitingText;
             });
         }
 
         public void onStreaming () {
             Dispatcher.invokeSafely (() => {
-                ctlBtn01.Content = Constant.StopText;
-                ctlBtn02.Content = startedSymbol;
-                true.able (ctlBtn01, ctlBtn02);
+                downloadCtl.Content = Constant.StopText;
+                downloadCtl2.Content = startedSymbol;
+                true.able (downloadCtl, downloadCtl2);
                 statusOfLiveView.Content = Constant.RecordingText;
             });
         }
 
         public void onStopped () {
             Dispatcher.invokeSafely (() => {
-                ctlBtn01.Content = Constant.StartText;
-                ctlBtn02.Content = stoppedSymbol;
-                true.able (ctlBtn01, ctlBtn02, configViewRoot);
+                downloadCtl.Content = Constant.StartText;
+                downloadCtl2.Content = stoppedSymbol;
+                true.able (downloadCtl, downloadCtl2, configViewRoot);
                 statusOfLiveView.Content = Constant.RecordStopText;
             });
         }

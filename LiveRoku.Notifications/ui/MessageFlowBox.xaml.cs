@@ -84,7 +84,7 @@ namespace LiveRoku.Notifications {
             //Keep open on unexpectedly closed
             Task.Run (() => {
                 invokeSafely(popbox.Dispatcher, () => {
-                    popbox.IsOpen = true;
+                    PopupHelper.SetVisible(popbox, true);
                 });
             });
         }
@@ -159,6 +159,10 @@ namespace LiveRoku.Notifications {
                 e.Handled = true;
             }
         }
+        
+        private void recordLocationClick(object sender, MouseButtonEventArgs e) {
+            PopupHelper.getUpdatedLocation(popbox);
+        }
 
         private void clearFlowMessage (object sender, RoutedEventArgs e) {
             msgHost.FlowMsgs.Clear ();
@@ -193,5 +197,6 @@ namespace LiveRoku.Notifications {
                 action.Invoke();
             } else dispatcher.BeginInvoke (DispatcherPriority.Normal, action);
         }
+
     }
 }

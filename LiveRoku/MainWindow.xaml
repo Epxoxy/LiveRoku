@@ -277,8 +277,9 @@
                                     <Rectangle x:Name="exploreArea" Grid.Row="1" Fill="#ffe6cc" Height="48" Cursor="Hand" ToolTip="Click to open location"/>
                                     <TextBlock Grid.Row="1" Text="{Binding Content, ElementName=statusOfLiveView}" IsHitTestVisible="False"
                                                Style="{StaticResource AlignCenter}" FontSize="14" Foreground="Gray"/>
-                                    <Button x:Name="startEndBtn02" Height="48" Width="48" Background="#ffab91" Style="{StaticResource ShadowCircleBtnStyle02}" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                            Margin="10,24" Grid.RowSpan="2" Foreground="White" Content="{StaticResource {x:Static local:Constant.PauseSymbolKey}}" />
+                                    <Button x:Name="startEndBtn02" Height="48" Width="48" Background="#3bcca1" Style="{StaticResource ShadowCircleBtnStyle02}" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                            Margin="10,24" Grid.RowSpan="2" Foreground="White" Content="{StaticResource {x:Static local:Constant.StopSymbolKey}}" >
+                                    </Button>
                                 </Grid>
                             </ContentControl>
                         </Grid>
