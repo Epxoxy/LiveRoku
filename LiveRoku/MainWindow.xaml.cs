@@ -76,41 +76,43 @@ namespace LiveRoku {
         private void onLoaded (object sender, RoutedEventArgs e) {
             this.Loaded -= onLoaded;
             //Load basic resources
-            stoppedSymbol = FindResource (Constant.StopSymbolKey) as UIElement;
-            startedSymbol = FindResource (Constant.RightSymbolKey) as UIElement;
-            waitingSymbol = FindResource (Constant.LoadingSymbolKey) as UIElement;
-            mgr = new LoadManager(AppDomain.CurrentDomain.BaseDirectory);
-            LoadContextBase ctxBase = null;
-            try {
-                ctxBase = mgr.initCtxBase();
-                var mArgs = ctxBase.AppLocalData.getAppSettings().get("Args", new MySettings());
-                this.settings = mArgs;
-                initSettings(mArgs);
-            } catch(Exception ex) {
-                Task.Run (() => { MessageBox.Show (ex.Message, "Error"); });
-            }
-            this.settings = this.settings ?? new MySettings();
-            var coreLoaded = ctxBase?.LoadOk == true;
-            //Subscribe basic events
-            Dispatcher.invokeSafely (() => purgeEvents (resubscribe : true, justBasicEvent: !coreLoaded));
-            try {
-                if (!coreLoaded || (ctx = mgr.create(this)) == null) return;
-            } catch(Exception ex) {
-                Task.Run (() => { MessageBox.Show (ex.Message, "Error"); });
-            }
-            ctx.Fetcher.Logger.LogHandlers.add(this);
-            ctx.Fetcher.LiveProgressBinders.add(this);
-            ctx.Fetcher.StatusBinders.add(this);
-            ctx.Plugins.ForEach(plugin => {
+            stoppedSymbol = FindResource(Constant.StopSymbolKey) as UIElement;
+            startedSymbol = FindResource(Constant.RightSymbolKey) as UIElement;
+            waitingSymbol = FindResource(Constant.LoadingSymbolKey) as UIElement;
+            Task.Run(() => {
+                mgr = new LoadManager(AppDomain.CurrentDomain.BaseDirectory);
+                LoadContextBase ctxBase = null;
+                bool coreLoaded = false;
                 Utils.runSafely(() => {
-                    plugin.onInitialize(ctx.AppLocalData.getAppSettings());
-                    ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} loaded.");
-                });
-                Utils.runSafely(() => {
-                    plugin.onAttach(ctx);
-                    ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} Attach.");
+                    ctxBase = mgr.initCtxBase();
+                    coreLoaded = ctxBase?.LoadOk == true;
+                    restoreSettings((this.settings = ctxBase.AppLocalData.getAppSettings().get("Args", new MySettings())));
+                }, tipsMsgByTask);
+                //Ensure setttings create
+                this.settings = this.settings ?? new MySettings();
+                //Subscribe basic events
+                Dispatcher.invokeSafely(() => purgeEvents(resubscribe: true, justBasicEvent: !coreLoaded));
+                try { if (!coreLoaded || (ctx = mgr.create(this)) == null) return; }
+                catch (Exception ex) { tipsMsgByTask(ex); }
+                //Register handlers of this to fetcher
+                ctx.Fetcher.Logger.LogHandlers.add(this);
+                ctx.Fetcher.LiveProgressBinders.add(this);
+                ctx.Fetcher.StatusBinders.add(this);
+                ctx.Plugins.ForEach(plugin => {
+                    Utils.runSafely(() => {
+                        plugin.onInitialize(ctx.AppLocalData.getAppSettings());
+                        ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} loaded.");
+                    });
+                    Utils.runSafely(() => {
+                        plugin.onAttach(ctx);
+                        ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} Attach.");
+                    });
                 });
             });
+        }
+
+        private void tipsMsgByTask(Exception e) {
+            Task.Run(() => MessageBox.Show(e.Message, "Error"));
         }
 
         protected override void OnClosing (CancelEventArgs e) {
@@ -134,7 +136,8 @@ namespace LiveRoku {
             base.OnClosing (e);
         }
         
-        private void initSettings (MySettings settings) {
+        private void restoreSettings (MySettings settings) {
+            if (settings == null) return;
             Dispatcher.invokeSafely (() => {
                 roomIdBox.Text = settings.LastRoomId.ToString ();
                 saveDanmaku.IsChecked = settings.DownloadDanmaku;
@@ -326,6 +329,23 @@ namespace LiveRoku {
             } catch (Exception e) {
                 System.Diagnostics.Debug.WriteLine (e.ToString ());
             }
+        }
+
+        public static void runSafely (Action doWhat, Action<Exception> onError) {
+            try {
+                doWhat?.Invoke ();
+            } catch (Exception e) {
+                onError.Invoke(e);
+            }
+        }
+
+        public static T runSafely<T> (Func<T> doWhat, Action<Exception> onError) {
+            try {
+                return doWhat.Invoke ();
+            } catch (Exception e) {
+                onError.Invoke(e);
+            }
+            return default(T);
         }
 
         public static void able (this bool enable, params UIElement[] elements) {
