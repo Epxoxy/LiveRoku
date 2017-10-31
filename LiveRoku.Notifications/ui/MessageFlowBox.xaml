@@ -174,7 +174,7 @@
                     <RowDefinition Height="36"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Border CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick" MouseLeftButtonUp="recordLocationClick">
+                <Border CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />

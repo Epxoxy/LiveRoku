@@ -57,7 +57,7 @@ namespace LiveRoku.Notifications.helpers {
                 }
             }
         }
-        //Callback on 'IsInView' property changed
+        //Callback on 'Visible' property changed
         private static void onVisibleChanged (DependencyObject d, DependencyPropertyChangedEventArgs e) {
             var popup = d as Popup;
             if (popup != null) {

@@ -6,6 +6,9 @@
     using LiveRoku.Base.Logger;
     using LiveRoku.Base.Plugin;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Text;
+
     public class StateFix : StatusAndLiveProgressBinderBase, IPlugin {
         public string Token => typeof(StateFix).FullName;
         public IPluginDescriptor Descriptor { get; } = new PluginDescriptor {
@@ -44,21 +47,16 @@
         public override void onMissionComplete(IMission mission) {
             if (!string.IsNullOrEmpty(mission.VideoObjectName)) {
                 try {
-                    var file = new System.IO.FileInfo(mission.VideoObjectName);
+                    var file = new FileInfo(mission.VideoObjectName);
                     if (file.Directory.Exists) {
-                        var msFile = new System.IO.FileInfo(System.IO.Path.Combine(file.Directory.FullName, "mission.txt"));
-                        using (var fs = msFile.Exists ? msFile.OpenWrite() : msFile.Create()) {
-                            using (var writer = new System.IO.StreamWriter(fs, System.Text.Encoding.UTF8)) {
-                                var builder = new System.Text.StringBuilder();
-                                foreach (var info in mission.RoomInfoHistory) {
-                                    builder.Append("@TimeLine>>").Append(info.TimeLine)
-                                        .Append("@Title>>").Append(info.Title);
-                                }
-                                builder.Append("@TimeSlice>>").Append(mission.BeginTime).Append(" -- ").Append(mission.EndTime);
-                                writer.WriteLine("------------");
-                                writer.WriteLine(mission.VideoObjectName);
-                                writer.WriteLine(builder.ToString());
+                        using (var writer = new StreamWriter(Path.Combine(file.Directory.FullName, "mission.txt"), true , Encoding.UTF8)) {
+                            var builder = new StringBuilder().AppendLine("------------").AppendLine(file.Name);
+                            foreach (var info in mission.RoomInfoHistory) {
+                                builder.Append("{(TimeLine) >> ").Append(info.TimeLine).Append("} ")
+                                    .Append("{(Title) >> ").Append(info.Title).Append("} ").AppendLine();
                             }
+                            builder.Append("{(TimeSlice) >> ").Append(mission.BeginTime).Append(" -- ").Append(mission.EndTime).Append("}");
+                            writer.WriteLine(builder.ToString());
                         }
                     }
                     if (file.Exists && file.Length <= 1024 * 10) {
