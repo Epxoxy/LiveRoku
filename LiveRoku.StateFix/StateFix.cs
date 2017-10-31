@@ -45,7 +45,23 @@
             if (!string.IsNullOrEmpty(mission.VideoObjectName)) {
                 try {
                     var file = new System.IO.FileInfo(mission.VideoObjectName);
-                    if(file.Exists && file.Length <= 1024 * 10) {
+                    if (file.Directory.Exists) {
+                        var msFile = new System.IO.FileInfo(System.IO.Path.Combine(file.Directory.FullName, "mission.txt"));
+                        using (var fs = msFile.Exists ? msFile.OpenWrite() : msFile.Create()) {
+                            using (var writer = new System.IO.StreamWriter(fs, System.Text.Encoding.UTF8)) {
+                                var builder = new System.Text.StringBuilder();
+                                foreach (var info in mission.RoomInfoHistory) {
+                                    builder.Append("@TimeLine>>").Append(info.TimeLine)
+                                        .Append("@Title>>").Append(info.Title);
+                                }
+                                builder.Append("@TimeSlice>>").Append(mission.BeginTime).Append(" -- ").Append(mission.EndTime);
+                                writer.WriteLine("------------");
+                                writer.WriteLine(mission.VideoObjectName);
+                                writer.WriteLine(builder.ToString());
+                            }
+                        }
+                    }
+                    if (file.Exists && file.Length <= 1024 * 10) {
                         file.Delete();
                     }
                 }catch(Exception e) {
