@@ -17,6 +17,7 @@
         //private FloatingBox box;
         private object locker = new object();
         private IFloatingHost box;
+        private bool skipTVGiftDm;
 
         public LevitatedUI () { }
 
@@ -26,10 +27,11 @@
                 box = null;
             }
             Extra = Extra ?? new EasySettings ();
+            skipTVGiftDm = Extra.get("skip-tv-gift-danmaku", false);
             var defaultBox = typeof (MessageFlowBox).Name;
-            var exist = Extra.get("token-box", defaultBox);
+            var boxType = Extra.get("token-box", defaultBox);
             var app = Application.Current;
-            if (defaultBox.Equals (exist)) {
+            if (defaultBox.Equals (boxType)) {
                 Extra.put("token-box", typeof(MessageFlowBox).Name);
                 app.Dispatcher.Invoke(() => {
                     var win = Application.Current?.MainWindow;
@@ -67,7 +69,8 @@
         }
 
         public void onDanmaku (DanmakuModel danmaku) {
-            if (danmaku.MsgType == MsgTypeEnum.Comment)
+            //Show only the chat message and skip the "Little TV" gift danmaku if in need
+            if (danmaku.MsgType == MsgTypeEnum.Comment && (!skipTVGiftDm || string.IsNullOrEmpty(danmaku.roomID)))
                 box.addMessage (danmaku.UserName, danmaku.CommentText);
         }
 
