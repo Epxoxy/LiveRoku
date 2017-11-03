@@ -232,22 +232,22 @@
                             <ToggleButton x:Name="flowToggle" Unchecked="disableFlowMessage" Checked="enableFlowMessage" IsChecked="True" Padding="0" Style="{StaticResource ToggleSwitchControlStyle}"/>
                             <Button Style="{StaticResource NormalButtonStyle}" Padding="5,0" Click="clearFlowMessage">
                                 <Border x:Name="statusFill" Background="#FF03A9F4" BorderBrush="White" CornerRadius="6" Height="18" Width="32">
-                                <Border.Resources>
-                                    <Storyboard x:Key="statusToBlue">
-                                        <ColorAnimation Storyboard.TargetName="statusFill" Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)" To="{StaticResource Status.Blue.Color}" Duration="00:00:00"/>
-                                    </Storyboard>
-                                    <Storyboard x:Key="statusToYello">
-                                        <ColorAnimation Storyboard.TargetName="statusFill" Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)" To="{StaticResource Status.Yellow.Color}" Duration="00:00:00" />
-                                    </Storyboard>
-                                </Border.Resources>
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup>
-                                        <VisualState x:Name="Blue" Storyboard="{StaticResource statusToBlue}" />
-                                        <VisualState x:Name="Yellow" Storyboard="{StaticResource statusToYello}"/>
-                                        <VisualState x:Name="Normal" Storyboard="{StaticResource statusToBlue}" />
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-                                <Viewbox Stretch="Uniform" >
+                                    <Border.Resources>
+                                        <Storyboard x:Key="statusToBlue">
+                                            <ColorAnimation Storyboard.TargetName="statusFill" Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)" To="{StaticResource Status.Blue.Color}" Duration="00:00:00"/>
+                                        </Storyboard>
+                                        <Storyboard x:Key="statusToYello">
+                                            <ColorAnimation Storyboard.TargetName="statusFill" Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)" To="{StaticResource Status.Yellow.Color}" Duration="00:00:00" />
+                                        </Storyboard>
+                                    </Border.Resources>
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup>
+                                            <VisualState x:Name="Blue" Storyboard="{StaticResource statusToBlue}" />
+                                            <VisualState x:Name="Yellow" Storyboard="{StaticResource statusToYello}"/>
+                                            <VisualState x:Name="Normal" Storyboard="{StaticResource statusToBlue}" />
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Viewbox Stretch="Uniform" >
                                         <Label Content="{Binding Items.Count, ElementName=flowItems}" x:Name="countLb" Foreground="White" FontWeight="SemiBold" FontSize="29" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         </Label>
                                     </Viewbox>

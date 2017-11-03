@@ -56,10 +56,12 @@ namespace LiveRoku {
         //--------------------------------------
         //IMPLEMENTS Download parameters model
         //--------------------------------------
-        public string RoomId => Dispatcher.invokeSafely (() => roomIdBox.Text);
-        public string Folder => Dispatcher.invokeSafely (() => settings.DownloadFolder);
-        public string FileFormat => Dispatcher.invokeSafely (() => settings.DownloadFileFormat);
-        public bool DownloadDanmaku => Dispatcher.invokeSafely (() => saveDanmaku.IsChecked == true);
+        public string ShortRoomId => Dispatcher.invokeSafely (() => roomIdBox.Text);
+        public bool IsShortIdTheRealId => false;
+        public string Folder => settings.DownloadFolder;
+        public string FileFormat => settings.DownloadFileFormat;
+        public bool VideoRequire => settings.VideoRequire;
+        public bool DanmakuRequire => Dispatcher.invokeSafely (() => saveDanmaku.IsChecked == true);
         public bool AutoStart => Dispatcher.invokeSafely (() => autoStart.IsChecked == true);
         public string UserAgent => string.Empty;
 
@@ -124,11 +126,11 @@ namespace LiveRoku {
                     Utils.runSafely(() => plugin.onDetach(ctx));
                 });
                 //assign settings
-                if (int.TryParse(RoomId, out int roomId)) {
+                if (int.TryParse(ShortRoomId, out int roomId)) {
                     settings.addLastRoomId(roomId);
                 }
                 settings.AutoStart = AutoStart;
-                settings.DownloadDanmaku = DownloadDanmaku;
+                settings.DanmakuRequire = DanmakuRequire;
                 //save data
                 ctx.AppLocalData.getAppSettings().put("Args", this.settings);
                 ctx.saveAppData();
@@ -140,7 +142,7 @@ namespace LiveRoku {
             if (settings == null) return;
             Dispatcher.invokeSafely (() => {
                 roomIdBox.Text = settings.LastRoomId.ToString ();
-                saveDanmaku.IsChecked = settings.DownloadDanmaku;
+                saveDanmaku.IsChecked = settings.DanmakuRequire;
                 autoStart.IsChecked = settings.AutoStart;
                 locationBox.Text = System.IO.Path.Combine (Folder, FileFormat);
             });

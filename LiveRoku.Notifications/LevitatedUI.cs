@@ -28,6 +28,7 @@
             }
             Extra = Extra ?? new EasySettings ();
             skipTVGiftDm = Extra.get("skip-tv-gift-danmaku", false);
+            Extra.put("skip-tv-gift-danmaku", skipTVGiftDm);
             var defaultBox = typeof (MessageFlowBox).Name;
             var boxType = Extra.get("token-box", defaultBox);
             var app = Application.Current;
@@ -70,7 +71,7 @@
 
         public void onDanmaku (DanmakuModel danmaku) {
             //Show only the chat message and skip the "Little TV" gift danmaku if in need
-            if (danmaku.MsgType == MsgTypeEnum.Comment && (!skipTVGiftDm || string.IsNullOrEmpty(danmaku.roomID)))
+            if (danmaku.MsgType == MsgTypeEnum.Comment && (!skipTVGiftDm || string.IsNullOrEmpty(danmaku.RoomID)))
                 box.addMessage (danmaku.UserName, danmaku.CommentText);
         }
 

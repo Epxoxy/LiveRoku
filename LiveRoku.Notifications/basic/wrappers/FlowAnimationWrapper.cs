@@ -65,7 +65,7 @@ namespace LiveRoku.Notifications {
             } else {
                 if (removing) return;
                 removing = true;
-                if (cts != null && cts.Token.CanBeCanceled) {
+                if (cts?.Token.CanBeCanceled == true) {
                     cts.Cancel ();
                 }
                 cts = new CancellationTokenSource ();
@@ -82,7 +82,7 @@ namespace LiveRoku.Notifications {
 
         public void setIsEnabled (bool isEnabled) {
             this.isEnabled = isEnabled;
-            if (!isEnabled && cts != null && cts.Token.CanBeCanceled) {
+            if (!isEnabled && cts?.Token.CanBeCanceled == true) {
                 cts.Cancel ();
             }
         }
