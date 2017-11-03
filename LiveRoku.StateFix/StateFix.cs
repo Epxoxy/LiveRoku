@@ -44,8 +44,8 @@
         }
         
         public override void onPreparing () {
-            var cancelFlv = fetcher.Extra.get("cancel-flv", false);
-            if (cancelFlv) {
+            var videoRequire = fetcher.Extra.get("video-require", true);
+            if (!videoRequire) {
                 monitor.cleanup();
                 fetcher.LiveProgressBinders.remove(monitor);
                 fetcher.StatusBinders.remove(monitor);
@@ -88,7 +88,6 @@
             private int idleCheckTime;
 
             private object locker = new object();
-            private bool cancelFlv = false;
             private ILiveFetcher fetcher;
             
             public void init(ILiveFetcher fetcher, int idleCheckTime) {
@@ -132,7 +131,6 @@
             public override void onStreaming() {
                 newestRecvTime = DateTime.Now;
                 idleTimer.Stop();
-                if (cancelFlv) return;
                 downloadTest();
                 idleTimer.Start();
             }
