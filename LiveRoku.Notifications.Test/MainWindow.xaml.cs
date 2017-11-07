@@ -36,7 +36,7 @@ namespace LiveRoku.Notifications.Test {
         private void Button_Click (object sender, RoutedEventArgs e) {
             int num = new Random ().Next (1, 200);
             for (int i = 0; i < num; i++)
-                plugin.onDanmaku (new LiveRoku.Base.DanmakuModel () { MsgType = LiveRoku.Base.MsgTypeEnum.Comment, UserName = "Test only " + count++, CommentText = "Hello world!" });
+                plugin.onDanmakuReceive (new LiveRoku.Base.DanmakuModel () { MsgType = LiveRoku.Base.MsgTypeEnum.Comment, UserName = "Test only " + count++, CommentText = "Hello world!" });
         }
     }
 }

@@ -14,103 +14,38 @@ using LiveRoku.Base;
 using LiveRoku.UI;
 using LiveRoku.Base.Logger;
 using LiveRoku.Loader;
+using System.Runtime.CompilerServices;
+using PropertyChanged;
+using System.Diagnostics;
+using System.Windows.Data;
+using System.Globalization;
 
 namespace LiveRoku {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, ILogHandler, IFetchArgsHost, ILiveProgressBinder, IStatusBinder {
-        #region ------- UIElements proxy -----------
-        //--------------------------------------
-        //PART A : UIElements for IConfigHolder
-        //--------------------------------------
-        private TextBox roomIdBox => roomIdTBox;
-        private CheckBox saveDanmaku => saveCommentBox;
-        private CheckBox autoStart => autoStartBox;
-        private TextBlock locationBox => locationTBox;
-
-        //--------------------------------------
-        //PART B : UIElement for extend function
-        //--------------------------------------
-        private UIElement aboutLink => aboutLinkLabel;
+    public partial class MainWindow : Window {
+        
+        private UIElement viewAboutLink => aboutLinkLabel;
         private UIElement exploreFolder => savepathTextLabel;
         private UIElement exploreFolder2 => exploreArea;
-        private ButtonBase editPathBtn => openSavepathConfigDialogButton;
-        private UIElement configViewRoot => paramsElements;
-
-        //--------------------------------------
-        //PART C : UIElements for controlling process
-        //--------------------------------------
-        private ButtonBase downloadCtl => startEndBtn01;
-        private ButtonBase downloadCtl2 => startEndBtn02;
-
-        //--------------------------------------
-        //PART D : Some resources
-        //--------------------------------------
-        private UIElement waitingSymbol;
-        private UIElement stoppedSymbol;
-        private UIElement startedSymbol;
-
-        #endregion -----------------------------
-
-        //--------------------------------------
-        //IMPLEMENTS Download parameters model
-        //--------------------------------------
-        public string ShortRoomId => Dispatcher.invokeSafely (() => roomIdBox.Text);
-        public bool IsShortIdTheRealId => false;
-        public string Folder => settings.DownloadFolder;
-        public string FileFormat => settings.DownloadFileFormat;
-        public bool VideoRequire => settings.VideoRequire;
-        public bool DanmakuRequire => Dispatcher.invokeSafely (() => saveDanmaku.IsChecked == true);
-        public bool AutoStart => Dispatcher.invokeSafely (() => autoStart.IsChecked == true);
-        public string UserAgent => string.Empty;
-
-        //Helpers
-        private MySettings settings;
-        private LoadManager mgr;
-        private LoadContext ctx;
-
+        
+        private CoreBridge bridge = new CoreBridge();
+        
         public MainWindow () {
             InitializeComponent ();
+            this.DataContext = bridge;
             this.Loaded += onLoaded;
         }
 
         private void onLoaded (object sender, RoutedEventArgs e) {
             this.Loaded -= onLoaded;
-            //Load basic resources
-            stoppedSymbol = FindResource(Constant.StopSymbolKey) as UIElement;
-            startedSymbol = FindResource(Constant.RightSymbolKey) as UIElement;
-            waitingSymbol = FindResource(Constant.LoadingSymbolKey) as UIElement;
-            Task.Run(() => {
-                mgr = new LoadManager(AppDomain.CurrentDomain.BaseDirectory);
-                LoadContextBase ctxBase = null;
-                bool coreLoaded = false;
-                Utils.runSafely(() => {
-                    ctxBase = mgr.initCtxBase();
-                    coreLoaded = ctxBase?.LoadOk == true;
-                    restoreSettings((this.settings = ctxBase.AppLocalData.getAppSettings().get("Args", new MySettings())));
-                }, tipsMsgByTask);
-                //Ensure setttings create
-                this.settings = this.settings ?? new MySettings();
-                //Subscribe basic events
-                Dispatcher.invokeSafely(() => purgeEvents(resubscribe: true, justBasicEvent: !coreLoaded));
-                try { if (!coreLoaded || (ctx = mgr.create(this)) == null) return; }
-                catch (Exception ex) { tipsMsgByTask(ex); }
-                //Register handlers of this to fetcher
-                ctx.Fetcher.Logger.LogHandlers.add(this);
-                ctx.Fetcher.LiveProgressBinders.add(this);
-                ctx.Fetcher.StatusBinders.add(this);
-                ctx.Plugins.ForEach(plugin => {
-                    Utils.runSafely(() => {
-                        plugin.onInitialize(ctx.AppLocalData.getAppSettings());
-                        ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} loaded.");
-                    });
-                    Utils.runSafely(() => {
-                        plugin.onAttach(ctx);
-                        ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} Attach.");
-                    });
+            bridge.invokeLoad(coreLoaded => {
+                Dispatcher.invokeSafely(() => {
+                    //Subscribe basic events
+                    purgeEvents(resubscribe: true, justBasicEvent: !coreLoaded);
                 });
-            });
+            }, tipsMsgByTask);
         }
 
         private void tipsMsgByTask(Exception e) {
@@ -119,53 +54,29 @@ namespace LiveRoku {
 
         protected override void OnClosing (CancelEventArgs e) {
             purgeEvents ();
-            if(ctx != null) {
-                ctx.Fetcher?.stop();
-                ctx.Fetcher?.Dispose();
-                ctx.Plugins.ForEach(plugin => {
-                    Utils.runSafely(() => plugin.onDetach(ctx));
-                });
-                //assign settings
-                if (int.TryParse(ShortRoomId, out int roomId)) {
-                    settings.addLastRoomId(roomId);
-                }
-                settings.AutoStart = AutoStart;
-                settings.DanmakuRequire = DanmakuRequire;
-                //save data
-                ctx.AppLocalData.getAppSettings().put("Args", this.settings);
-                ctx.saveAppData();
-            }
+            bridge.detachAndSave();
             base.OnClosing (e);
         }
-        
-        private void restoreSettings (MySettings settings) {
-            if (settings == null) return;
-            Dispatcher.invokeSafely (() => {
-                roomIdBox.Text = settings.LastRoomId.ToString ();
-                saveDanmaku.IsChecked = settings.DanmakuRequire;
-                autoStart.IsChecked = settings.AutoStart;
-                locationBox.Text = System.IO.Path.Combine (Folder, FileFormat);
-            });
-        }
-        
+
+        #region -------------- event handlers --------------
         //Part for controlling progress
         //Subscribe function like start, about,set/explore location
-        #region -------------- event handlers --------------
+
         private void purgeEvents (bool resubscribe = false, bool justBasicEvent = false) {
             exploreFolder.MouseLeftButtonUp -= explore;
             exploreFolder2.MouseLeftButtonUp -= explore;
-            aboutLink.MouseLeftButtonUp -= showAbout;
-            editPathBtn.Click -= setLocation;
-            downloadCtl.Click -= startOrStop;
-            downloadCtl2.Click -= startOrStop;
+            viewAboutLink.MouseLeftButtonUp -= showAbout;
+            modifyLoationBtn.Click -= setLocation;
+            startEndBtn01.Click -= startOrStop;
+            startEndBtn02.Click -= startOrStop;
             if (resubscribe) {
                 exploreFolder.MouseLeftButtonUp += explore;
                 exploreFolder2.MouseLeftButtonUp += explore;
-                aboutLink.MouseLeftButtonUp += showAbout;
-                editPathBtn.Click += setLocation;
+                viewAboutLink.MouseLeftButtonUp += showAbout;
+                modifyLoationBtn.Click += setLocation;
                 if (!justBasicEvent) {
-                    downloadCtl.Click += startOrStop;
-                    downloadCtl2.Click += startOrStop;
+                    startEndBtn01.Click += startOrStop;
+                    startEndBtn02.Click += startOrStop;
                 }
             }
         }
@@ -175,28 +86,28 @@ namespace LiveRoku {
         }
 
         private void startOrStop (object sender, RoutedEventArgs e) {
-            if (ctx.Fetcher == null) return;
-            if (ctx.Fetcher.IsRunning)
-                ctx.Fetcher.stop ();
-            else ctx.Fetcher.start ();
+            if (bridge.Fetcher == null) return;
+            if (bridge.Fetcher.IsRunning)
+                bridge.Fetcher.stop ();
+            else bridge.Fetcher.start ();
         }
 
         private void setLocation (object sender, RoutedEventArgs e) {
             var dialog = new LocationSettings () {
                 Owner = this,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Folder = settings.DownloadFolder,
-                FileName = settings.DownloadFileFormat
+                Folder = bridge.Folder,
+                FileName = bridge.FileFormat
             };
             if (dialog.ShowDialog () == true) {
-                settings.DownloadFolder = dialog.Folder;
-                settings.DownloadFileFormat = dialog.FileName;
-                locationBox.Text = System.IO.Path.Combine (Folder, FileFormat);
+                bridge.Folder = dialog.Folder;
+                bridge.FileFormat = dialog.FileName;
+                bridge.LocationFormat = System.IO.Path.Combine (bridge.Folder, bridge.FileFormat);
             }
         }
 
         private void explore (object sender, MouseButtonEventArgs e) {
-            System.Diagnostics.Process.Start (Folder);
+            System.Diagnostics.Process.Start (bridge.Folder);
         }
 
         private void showAbout (object sender, MouseButtonEventArgs e) {
@@ -215,11 +126,7 @@ namespace LiveRoku {
         }
 
         private void updateTitleClick (object sender, RoutedEventArgs e) {
-            Task.Run (() => {
-                var title = ctx.Fetcher.getRoomInfo (true) ?.Title;
-                if (string.IsNullOrEmpty (title)) return;
-                Dispatcher.invokeSafely (() => titleView.Text = title);
-            });
+            bridge.updateRoomInfo();
         }
 
         private void hideTitleClick (object sender, MouseButtonEventArgs e) {
@@ -229,99 +136,223 @@ namespace LiveRoku {
         }
         #endregion ------------------------------------------
 
-        //Part for controlling the UIElement status
-        //And the process of downloader
-        #region ------------- implement IStatusBinder -------------
-        public void onPreparing () {
-            Dispatcher.invokeSafely (() => {
-                downloadCtl.Content = Constant.PreparingText;
-                downloadCtl2.Content = waitingSymbol;
-                false.able (downloadCtl, downloadCtl2, configViewRoot);
-                statusOfLiveView.Content = Constant.PreparingText;
+    }
+
+    //TODO Implement MVVM
+    //TODO Move command from MainWindow's event handlers
+    [AddINotifyPropertyChangedInterface]
+    public class CoreBridge : LiveResolverBase, IPreferences, ILogHandler {
+        public string ShortRoomId { get; set; }
+        public bool IsShortIdTheRealId { get; set; } = false;
+        public string Folder { get; set; }
+        public string FileFormat { get; set; }
+        public bool DanmakuRequire { get; set; } = true;
+        public bool VideoRequire { get; set; } = true;
+        public bool AutoStart { get; set; } = true;
+        public string UserAgent { get; set; } = string.Empty;
+        [DoNotNotify]
+        public ISettingsBase Extra { get; set; }
+
+        public string LocationFormat { get; set; }
+        public long Popularity { get; set; }
+        public string BitRate { get; set; }
+        public string ReceiveSize { get; set; }
+        public string Duration { get; set; }
+        public bool CmdEnabled { get; set; } = true;
+        public bool PreferencesEnabled { get; set; } = true;
+        public IRoomInfo RoomInfo { get; set; }
+        public BootStates BootStates { get; set; }
+        public string LiveStatusText { get; set; }
+
+        internal ILiveFetcher Fetcher => ctx?.Fetcher;
+        private LoadContext ctx;
+        private LoadManager mgr;
+        private bool isLoaded = false;
+        
+        public Task invokeLoad(Action<bool> onCoreLoaded, Action<Exception> tipsError) {
+            if (isLoaded)
+                return Task.FromResult(false);
+            return Task.Run(() => {
+                isLoaded = true;
+                mgr = new LoadManager(AppDomain.CurrentDomain.BaseDirectory);
+                LoadContextBase ctxBase = null;
+                bool coreLoaded = false;
+                Utils.runSafely(() => {
+                    ctxBase = mgr.initCtxBase();
+                    coreLoaded = ctxBase?.LoadOk == true;
+                    this.restore(ctxBase.AppLocalData.getAppSettings());
+                }, tipsError);
+                onCoreLoaded?.Invoke(coreLoaded);
+                //Create core context
+                try { if (!coreLoaded || (ctx = mgr.create(this)) == null) return; }
+                catch (Exception ex) { tipsError(ex); }
+                //Register handlers of this to fetcher
+                ctx.Fetcher.Logger.LogHandlers.add(this);
+                ctx.Fetcher.LiveProgressBinders.add(this);
+                ctx.Fetcher.DanmakuHandlers.add(this);
+                ctx.Fetcher.StatusBinders.add(this);
+                ctx.Plugins.ForEach(plugin => {
+                    Utils.runSafely(() => {
+                        plugin.onInitialize(ctx.AppLocalData.getAppSettings());
+                        ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} Loaded.");
+                    });
+                    Utils.runSafely(() => {
+                        plugin.onAttach(ctx);
+                        ctx.Fetcher.Logger.log(Level.Info, $"{plugin.GetType().Name} Attach.");
+                    });
+                });
             });
         }
 
-        public void onWaiting () {
-            Dispatcher.invokeSafely (() => {
-                downloadCtl.Content = Constant.WaitingText;
-                downloadCtl2.Content = waitingSymbol;
-                false.able (configViewRoot);
-                true.able (downloadCtl, downloadCtl2);
-                statusOfLiveView.Content = Constant.WaitingText;
+        public void detachAndSave() {
+            if (ctx != null) {
+                ctx.Fetcher?.stop();
+                ctx.Fetcher?.Dispose();
+                ctx.Plugins.ForEach(plugin => {
+                    Utils.runSafely(() => plugin.onDetach(ctx));
+                });
+                MyPreferences pref = new MyPreferences();
+                update(ctx.AppLocalData.getAppSettings(), ref pref);
+                ctx.saveAppData();
+            }
+        }
+
+        public void restore(ISettings settings) {
+            var previous = settings.get<MyPreferences>("Args", null);
+            if (previous == null)
+                return;
+            ShortRoomId = previous.LastRoomId.ToString();
+            Folder = previous.DownloadFolder;
+            FileFormat = previous.DownloadFileNameFormat;
+            LocationFormat = System.IO.Path.Combine(Folder, FileFormat);
+            DanmakuRequire = previous.DanmakuRequire;
+            VideoRequire = previous.VideoRequire;
+            AutoStart = previous.AutoStart;
+        }
+
+        public void update(ISettings settings, ref MyPreferences pref) {
+            if (pref == null)
+                pref = new MyPreferences();
+            if (int.TryParse(ShortRoomId, out int roomId)) {
+                pref.addLastRoomId(roomId);
+            }
+            pref.DownloadFolder = Folder;
+            pref.DownloadFileNameFormat = FileFormat;
+            pref.DanmakuRequire = DanmakuRequire;
+            pref.VideoRequire = VideoRequire;
+            pref.AutoStart = AutoStart;
+            settings.put("Args", pref);
+        }
+
+        public Task updateRoomInfo() {
+            return Task.Run(() => {
+                this.RoomInfo = this.Fetcher?.getRoomInfo(true);
             });
         }
 
-        public void onStreaming () {
-            Dispatcher.invokeSafely (() => {
-                downloadCtl.Content = Constant.StopText;
-                downloadCtl2.Content = startedSymbol;
-                true.able (downloadCtl, downloadCtl2);
-                statusOfLiveView.Content = Constant.RecordingText;
-            });
-        }
-
-        public void onStopped () {
-            Dispatcher.invokeSafely (() => {
-                downloadCtl.Content = Constant.StartText;
-                downloadCtl2.Content = stoppedSymbol;
-                true.able (downloadCtl, downloadCtl2, configViewRoot);
-                statusOfLiveView.Content = Constant.RecordStopText;
-            });
-        }
-        #endregion ---------------------------------------------
-
-        //Part for showing some data in UIElements which named end with view
-        #region ------------- implement interfaces -------------
-
-        public void onLog (Level level, string message) {
+        public void onLog(Level level, string message) {
             string info = $"[{level}] {message}\n";
-            System.Diagnostics.Debug.WriteLine (message, level.ToString ());
-            Dispatcher.invokeSafely (() => {
+            Debug.WriteLine(message, level.ToString());
+            /*Dispatcher.invokeSafely(() => {
                 if (debugView.Text.Length > 25600) {
-                    var text = debugView.Text.Substring (12800);
-                    var index2 = text.IndexOf ("\n");
-                    var builder = new StringBuilder ();
+                    var text = debugView.Text.Substring(12800);
+                    var index2 = text.IndexOf("\n");
+                    var builder = new StringBuilder();
                     if (index2 > 0) {
-                        builder.Append (text.Substring (index2));
+                        builder.Append(text.Substring(index2));
                     } else {
-                        builder.Append (text);
+                        builder.Append(text);
                     }
-                    builder.Append (info);
-                    debugView.Clear ();
-                    debugView.AppendText (builder.ToString ());
+                    builder.Append(info);
+                    debugView.Clear();
+                    debugView.AppendText(builder.ToString());
                 } else {
-                    debugView.AppendText (info);
+                    debugView.AppendText(info);
                 }
-            });
+            });*/
         }
 
-        public void onStatusUpdate (bool on) {
-            string tips = on ? Constant.LiveOnText : Constant.LiveOffText;
-            ctx.Fetcher.Logger.log (Level.Info, "Now status is " + tips);
-            Dispatcher.invokeSafely (() => { statusOfLiveView.Content = tips; });
+        //--------------- IStatusBinder ------------------
+        public override void onPreparing() {
+            BootStates = BootStates.Preparing;
+            PreferencesEnabled = false;
+            CmdEnabled = false;
         }
 
-        public void onDurationUpdate (long duration, string timeText) {
-            Dispatcher.invokeSafely (() => { recordTimeView.Content = timeText; });
+        public override void onWaiting() {
+            BootStates = BootStates.Waiting;
+            PreferencesEnabled = false;
+            CmdEnabled = true;
         }
 
-        public void onDownloadSizeUpdate (long size, string sizeText) {
-            Dispatcher.invokeSafely (() => { sizeView.Content = sizeText; });
+        public override void onStreaming() {
+            BootStates = BootStates.Streaming;
+            PreferencesEnabled = false;
+            CmdEnabled = true;
         }
 
-        public void onBitRateUpdate (long bitRate, string bitRateText) {
-            Dispatcher.invokeSafely (() => { bitRateView.Content = bitRateText; });
+        public override void onStopped() {
+            BootStates = BootStates.Stopped;
+            PreferencesEnabled = true;
+            CmdEnabled = true;
         }
 
-        public void onHotUpdate (long popularity) {
-            Dispatcher.invokeSafely (() => { hotView.Content = popularity; });
-            System.Diagnostics.Debug.WriteLine ("Updated : Hot -> " + popularity);
+        //--------------- IDanmakuResolver ------------------
+        public override void onLiveStatusUpdateByDanmaku(bool isOn) {
+            LiveStatusText = isOn ? Constant.LiveOnText : Constant.LiveOffText;
         }
 
-        public void onMissionComplete (IMission mission) { }
+        public override void onHotUpdateByDanmaku(long popularity) {
+            Popularity = popularity;
+        }
 
-        #endregion ---------------------------------------------
+        //--------------- IDownloadProgressBinder ------------------
+        public override void onDurationUpdate(long duration, string timeText) {
+            Duration = timeText;
+        }
 
+        public override void onDownloadSizeUpdate(long size, string sizeText) {
+            ReceiveSize = sizeText;
+        }
+
+        public override void onBitRateUpdate(long bitRate, string bitRateText) {
+            BitRate = bitRateText;
+        }
+        
+    }
+
+    public enum BootStates {
+        Stopped,
+        Preparing,
+        Waiting,
+        Streaming
+    }
+
+    public class BootStatesToValueConverter : IValueConverter {
+        public object StoppedValue { get; set; }
+        public object PreparingValue { get; set; }
+        public object WaitingValue { get; set; }
+        public object StreamingValue { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+            if (value is BootStates) {
+                switch ((BootStates)value) {
+                    case BootStates.Stopped:
+                        return StoppedValue;
+                    case BootStates.Preparing:
+                        return PreparingValue;
+                    case BootStates.Waiting:
+                        return WaitingValue;
+                    case BootStates.Streaming:
+                        return StreamingValue;
+                }
+            }
+            return StoppedValue;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+            throw new NotImplementedException();
+        }
     }
 
     static class Utils {
@@ -366,6 +397,34 @@ namespace LiveRoku {
             if (Thread.CurrentThread == dispatcher.Thread) {
                 return func ();
             } else return dispatcher.Invoke<TResult> (func, DispatcherPriority.Normal);
+        }
+
+    }
+
+    //TODO Delete it
+    public class Bindable : INotifyPropertyChanged {
+        private Dictionary<string, object> properties = new Dictionary<string, object>();
+
+        protected T Get<T>([CallerMemberName] string name = null) {
+            Debug.Assert(name != null, "name != null");
+            object value = null;
+            if (properties.TryGetValue(name, out value))
+                return value == null ? default(T) : (T)value;
+            return default(T);
+        }
+
+        protected void Set<T>(T value, [CallerMemberName] string name = null) {
+            Debug.Assert(name != null, "name != null");
+            if (Equals(value, Get<T>(name)))
+                return;
+            properties[name] = value;
+            OnPropertyChanged(name);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
     }

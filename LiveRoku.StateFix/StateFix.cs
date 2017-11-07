@@ -1,16 +1,17 @@
 ﻿namespace LiveRoku.StateFix {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
     using LiveRoku.Base;
     using LiveRoku.Base.Logger;
     using LiveRoku.Base.Plugin;
-    using System.Diagnostics.CodeAnalysis;
+    using System;
     using System.IO;
     using System.Text;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
 
-    public class StateFix : StatusAndLiveProgressBinderBase, IPlugin {
+    public class StateFix : LiveResolverBase, IPlugin {
         public string Token => typeof(StateFix).FullName;
         public IPluginDescriptor Descriptor { get; } = new PluginDescriptor {
             Name = nameof(StateFix),
@@ -40,19 +41,21 @@
         }
 
         public void onDetach (IPluginHost host) {
-            monitor?.cleanup();
+            monitor.cleanup();
         }
         
         public override void onPreparing () {
             var videoRequire = fetcher.Extra.get("video-require", true);
-            if (!videoRequire) {
-                monitor.cleanup();
-                fetcher.LiveProgressBinders.remove(monitor);
-                fetcher.StatusBinders.remove(monitor);
-            } else {
+            fetcher.LiveProgressBinders.remove(monitor);
+            fetcher.DanmakuHandlers.remove(monitor);
+            fetcher.StatusBinders.remove(monitor);
+            if (videoRequire) {
                 monitor.init(fetcher, idleDuration);
                 fetcher.LiveProgressBinders.add(monitor);
+                fetcher.DanmakuHandlers.add(monitor);
                 fetcher.StatusBinders.add(monitor);
+            } else {
+                monitor.cleanup();
             }
         }
 
@@ -80,7 +83,7 @@
             }
         }
 
-        class MonitorImpl : StatusAndLiveProgressBinderBase{
+        class MonitorImpl : LiveResolverBase{
             private DateTime newestRecvTime;
             private CancellationTokenSource downloadTestCTS;
             private CancellationTokenSource idleTestCTS;
@@ -112,11 +115,10 @@
                 idleTimer.Stop();
             }
 
-            public override void onStatusUpdate(bool isOn) {
+            public override void onLiveStatusUpdateByDanmaku(bool isOn) {
                 if (isOn) downloadTest();
-                else idleTimer.Stop();
             }
-
+            
             public override void onDownloadSizeUpdate(long totalSize, string sizeText) {
                 newestRecvTime = DateTime.Now;
                 if (!idleTimer.Enabled)
@@ -160,17 +162,21 @@
             private void downloadTest() {
                 cancel(downloadTestCTS);
                 downloadTestCTS = new CancellationTokenSource();
+                downloadTestCTS.Token.Register(() => {
+                    Debug.WriteLine($"@{nameof(downloadTest)}. Test cancel", "state");
+                });
                 Task.Run(async () => {
                     //Delay test
-                    fetcher.Logger.log(Level.Info, $"@{nameof(downloadTest)}. Test after 10s....");
+                    Debug.WriteLine($"@{nameof(downloadTest)}. Test after 10s....", "state");
                     await Task.Delay(10000, downloadTestCTS.Token);
-                    downloadTestCTS.Token.ThrowIfCancellationRequested();
+                    if (downloadTestCTS.Token.IsCancellationRequested)
+                        return;
                     //Verify if need to restart
                     await verifyAndRestart(nameof(downloadTest), 1000, downloadTestCTS.Token);
-                    fetcher.Logger.log(Level.Info, $"@{nameof(downloadTest)}. Test complete.");
+                    Debug.WriteLine($"@{nameof(downloadTest)}. Test complete.", "state");
                 }, downloadTestCTS.Token).ContinueWith(task => {
                     if (task?.Exception != null)
-                        System.Diagnostics.Debug.WriteLine(task.Exception.ToString());
+                        Debug.WriteLine(task.Exception.ToString());
                 }, TaskContinuationOptions.OnlyOnFaulted);
             }
 
@@ -181,23 +187,24 @@
                 if ((pastMs = pastMsToNowFrom(newestRecvTime)) < maxIdleAllowTime)
                     return Task.FromResult<bool?>(false);
                 return Task.Run(() => {
-                    fetcher.Logger.log(Level.Info, $"@{sender}. Test pastMs is {pastMs / (double)1000 }s");
+                    Debug.WriteLine($"@{sender}. Test pastMs is {pastMs / (double)1000 }s", "verify");
                     //Check if live off
                     var info = fetcher.getRoomInfo(true);
-                    fetcher.Logger.log(Level.Info, $"@{sender}. Room.IsOn is [{info?.IsOn}]");
-                    token.ThrowIfCancellationRequested();
+                    Debug.WriteLine($"@{sender}. Room.IsOn is [{info?.IsOn}]", "verify");
                     //Check streaming one more time
-                    if ((pastMs = pastMsToNowFrom(newestRecvTime)) < maxIdleAllowTime)
+                    if (token.IsCancellationRequested
+                    || (pastMs = pastMsToNowFrom(newestRecvTime)) < maxIdleAllowTime
+                    || info?.IsOn == false) {
                         return false;
-                    if (info?.IsOn == false)
-                        return false;
+                    }
                     //Cancel if need
-                    token.ThrowIfCancellationRequested();
+                    if (token.IsCancellationRequested)
+                        return false;
                     restartFetcherAfter(sender, 50);
                     return true;
                 }, token).ContinueWith(task => {
                     if(task.Exception != null)
-                        System.Diagnostics.Debug.WriteLine(task.Exception.ToString());
+                        Debug.WriteLine(task.Exception.ToString());
                     return task?.Result;
                 });
             }
@@ -205,12 +212,12 @@
             private Task restartFetcherAfter(string sender, int delay) {
                 return Task.Run(() => {
                     if (fetcher.IsRunning) {
-                        fetcher.Logger.log(Level.Info, $"@{sender}. Trying to stop downloader");
-                        fetcher.Logger.log(Level.Info, $"@{sender}. Downloader will start after 50ms");
+                        fetcher.Logger.log(Level.Info, $"@{sender}. Need to restart downloader");
+                        fetcher.Logger.log(Level.Info, $"@{sender}. Downloader will start after {delay}ms");
                         fetcher.stop();
                         Thread.Sleep(delay);
                     }
-                    fetcher.Logger.log(Level.Info, $"@{sender}. Downloader is starting");
+                    Debug.WriteLine($"@{sender}. Downloader is starting", "restart");
                     fetcher.start();
                 });
             }

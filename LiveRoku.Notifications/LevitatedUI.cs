@@ -3,7 +3,7 @@
     using LiveRoku.Base;
     using LiveRoku.Base.Plugin;
     using LiveRoku.Base.Logger;
-    public class LevitatedUI : LiveProgressBinderBase, IPlugin, ILogHandler, IStatusBinder {
+    public class LevitatedUI : LiveResolverBase, IPlugin, ILogHandler {
         public string Token => typeof(LevitatedUI).FullName;
         public IPluginDescriptor Descriptor { get; } = new PluginDescriptor {
             Name = nameof(LevitatedUI),
@@ -53,10 +53,10 @@
         public void onAttach (IPluginHost host) {
             if (box == null) return;
             if (host!=null && host.Fetcher != null) {
+                host.Fetcher.Logger.LogHandlers.add(this);
                 host.Fetcher.LiveProgressBinders.add (this);
+                host.Fetcher.DanmakuHandlers.add(this);
                 host.Fetcher.StatusBinders.add (this);
-                host.Fetcher.Logger.LogHandlers.add (this);
-                host.Fetcher.DanmakuHandlers.add (onDanmaku);
             }
             box.show ();
         }
@@ -69,13 +69,18 @@
             box = null;
         }
 
-        public void onDanmaku (DanmakuModel danmaku) {
-            //Show only the chat message and skip the "Little TV" gift danmaku if in need
-            if (danmaku.MsgType == MsgTypeEnum.Comment && (!skipTVGiftDm || string.IsNullOrEmpty(danmaku.RoomID)))
-                box.addMessage (danmaku.UserName, danmaku.CommentText);
+        public void onLog(Level level, string message) {
+            box.addMessage(level.ToString(), message);
         }
 
-        public override void onStatusUpdate (bool on) {
+        public override void onDanmakuReceive(DanmakuModel danmaku) {
+            base.onDanmakuReceive(danmaku);
+            //Show only the chat message and skip the "Little TV" gift danmaku if in need
+            if (danmaku.MsgType == MsgTypeEnum.Comment && (!skipTVGiftDm || string.IsNullOrEmpty(danmaku.RoomID)))
+                box.addMessage(danmaku.UserName, danmaku.CommentText);
+        }
+
+        public override void onLiveStatusUpdateByDanmaku(bool on) {
             box.updateStatus (on);
             if (on) {
                 box.updateTips (TipsType.Normal, string.Empty);
@@ -84,33 +89,29 @@
             }
         }
 
+        public override void onHotUpdateByDanmaku(long popularity) { }
+
         public override void onDownloadSizeUpdate (long totalSize, string sizeText) {
             box.updateSizeText (sizeText);
         }
-
-        public override void onHotUpdate (long popularity) { }
-
-        public void onLog (Level level, string message) {
-            box.addMessage (level.ToString (), message);
-        }
-
-        public void onPreparing () {
+        
+        public override void onPreparing () {
             box.updateSizeText ("0000.00K");
             box.updateTips (TipsType.Yellow, "Prepare");
             box.updateStatus (false);
         }
 
-        public void onWaiting () {
+        public override void onWaiting () {
             box.updateTips (TipsType.Yellow, "Wait");
             box.updateStatus (false);
         }
 
-        public void onStreaming () {
+        public override void onStreaming () {
             box.updateTips (TipsType.Normal, string.Empty);
             box.updateStatus (true);
         }
 
-        public void onStopped () {
+        public override void onStopped () {
             box.updateTips (TipsType.Blue, "Stop");
             box.updateStatus (false);
         }

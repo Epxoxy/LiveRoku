@@ -8,9 +8,7 @@ using System.Windows.Media.Animation;
 
 namespace LiveRoku.Notifications {
     internal class FlowAnimationWrapper {
-        private CancellationTokenSource cts;
         private volatile bool animating;
-        private volatile bool removing;
         private ScrollViewer host;
         private Storyboard animated;
         private DoubleKeyFrame fromFrame;
@@ -21,6 +19,7 @@ namespace LiveRoku.Notifications {
         private object locker = new object ();
         private bool isEnabled = true;
         private int maxVisible = 7;
+        private System.Timers.Timer timer;
 
         public FlowAnimationWrapper (ScrollViewer host, IList src) {
             this.host = host;
@@ -45,15 +44,20 @@ namespace LiveRoku.Notifications {
             ScrollBinder.SetTarget (host, host);
             Storyboard.SetTarget (animated, this.host);
             Storyboard.SetTargetProperty (animated, new PropertyPath (ScrollBinder.OffsetProperty));
+            timer = new System.Timers.Timer(5000) {
+                AutoReset = true,
+            };
+            timer.Elapsed += isTimeToRemove;
         }
+
 
         public void raiseAnimated () {
             if (!isEnabled) return;
             if (src.Count > maxVisible) {
                 lock (locker) {
                     if (animating) return;
-                    removing = false;
                     animating = true;
+                    timer.Enabled = false;
                 }
                 var scrollable = host.ScrollableHeight - host.VerticalOffset;
                 var times = (scrollable / 40);
@@ -63,27 +67,24 @@ namespace LiveRoku.Notifications {
                 //toFrame.KeyTime = times < maxVisible ? slowTime : normalTime;
                 animated.Begin ();
             } else {
-                if (removing) return;
-                removing = true;
-                if (cts?.Token.CanBeCanceled == true) {
-                    cts.Cancel ();
-                }
-                cts = new CancellationTokenSource ();
-                Task.Run (async () => {
-                    while (!animating && removing && src.Count > 0) {
-                        await Task.Delay (5000, cts.Token);
-                        if (animating || src.Count <= 0) break;
-                        host.Dispatcher.Invoke (() => this.src.RemoveAt (0));
+                if (!animating && src.Count > 0) {
+                    if (!timer.Enabled) {
+                        timer.Start();
                     }
-                    removing = false;
-                }, cts.Token);
+                }
             }
+        }
+
+        private void isTimeToRemove(object sender, System.Timers.ElapsedEventArgs e) {
+            if (animating || src.Count <= 0)
+                return;
+            host.Dispatcher.Invoke(() => this.src.RemoveAt(0));
         }
 
         public void setIsEnabled (bool isEnabled) {
             this.isEnabled = isEnabled;
-            if (!isEnabled && cts?.Token.CanBeCanceled == true) {
-                cts.Cancel ();
+            if (!isEnabled) {
+                timer.Stop();
             }
         }
 
