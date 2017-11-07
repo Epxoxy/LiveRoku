@@ -305,7 +305,7 @@
                                 <local:SelectableTextBlock Margin="7,0" Padding="0,6" TextWrapping="WrapWithOverflow">
                                     <Run Text="{Binding Extra, Mode=OneWay, StringFormat='{}{0}&#x000a;'}" Foreground="DimGray"/>
                                     <Run Text="{Binding Tag, Mode=OneWay, StringFormat='{}{0}\: '}" Foreground="#1a0dab"/>
-                                    <Run Text="{Binding Content, Mode=OneWay}"/>
+                                    <Run MouseLeftButtonDown="copyToClipboard" Text="{Binding Content, Mode=OneWay}"/>
                                 </local:SelectableTextBlock>
                             </Border>
                         </DataTemplate>

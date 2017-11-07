@@ -75,9 +75,18 @@
 
         public override void onDanmakuReceive(DanmakuModel danmaku) {
             base.onDanmakuReceive(danmaku);
-            //Show only the chat message and skip the "Little TV" gift danmaku if in need
-            if (danmaku.MsgType == MsgTypeEnum.Comment && (!skipTVGiftDm || string.IsNullOrEmpty(danmaku.RoomID)))
-                box.addMessage(danmaku.UserName, danmaku.CommentText);
+            //Show only the chat message
+            if ((danmaku.MsgType == MsgTypeEnum.Comment)) {
+                //Skip the "SmallTV" gift auto danmaku if in need
+                if (string.IsNullOrEmpty(danmaku.RoomID) || !skipTVGiftDm) {
+                    box.addMessage(danmaku.UserName, danmaku.CommentText);
+                }
+            } else if(danmaku.MsgType == MsgTypeEnum.SystemMsg && danmaku.Extra != null) {
+                SmallTV smallTV = null;
+                if ((smallTV = danmaku.Extra as SmallTV) != null) {
+                    box.addMessage(smallTV.RealRoomId, smallTV.Url);
+                }
+            }
         }
 
         public override void onLiveStatusUpdateByDanmaku(bool on) {

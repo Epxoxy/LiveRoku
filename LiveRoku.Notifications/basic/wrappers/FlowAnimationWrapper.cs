@@ -68,9 +68,8 @@ namespace LiveRoku.Notifications {
                 animated.Begin ();
             } else {
                 if (!animating && src.Count > 0) {
-                    if (!timer.Enabled) {
-                        timer.Start();
-                    }
+                    timer.Stop();
+                    timer.Start();
                 }
             }
         }

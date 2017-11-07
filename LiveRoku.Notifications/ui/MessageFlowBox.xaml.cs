@@ -198,5 +198,13 @@ namespace LiveRoku.Notifications {
             } else dispatcher.BeginInvoke (DispatcherPriority.Normal, action);
         }
 
+        private void copyToClipboard(object sender, MouseButtonEventArgs e) {
+            if(e.ClickCount >= 2) {
+                System.Windows.Documents.Run item = null;
+                if ((item = sender as System.Windows.Documents.Run) != null) {
+                    Clipboard.SetText(item.Text);
+                }
+            }
+        }
     }
 }
