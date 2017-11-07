@@ -105,7 +105,7 @@
         }
         
         public override void onPreparing () {
-            box.updateSizeText ("0000.00K");
+            box.updateSizeText ("0000.00");
             box.updateTips (TipsType.Yellow, "Prepare");
             box.updateStatus (false);
         }

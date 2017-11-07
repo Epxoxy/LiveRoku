@@ -228,7 +228,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <TextBlock x:Name="sizeTb" Text="0000.00M" Margin="4,0" VerticalAlignment="Center" Foreground="LightGray" FontWeight="SemiBold" />
+                            <TextBlock x:Name="sizeTb" Text="0000.00" Margin="4,0" VerticalAlignment="Center" Foreground="LightGray" FontWeight="SemiBold" />
                             <ToggleButton x:Name="flowToggle" Unchecked="disableFlowMessage" Checked="enableFlowMessage" IsChecked="True" Padding="0" Style="{StaticResource ToggleSwitchControlStyle}"/>
                             <Button Style="{StaticResource NormalButtonStyle}" Padding="5,0" Click="clearFlowMessage">
                                 <Border x:Name="statusFill" Background="#FF03A9F4" BorderBrush="White" CornerRadius="6" Height="18" Width="32">
@@ -266,16 +266,15 @@
                               MaxHeight="280" VerticalAlignment="Top"
                               Visibility="{Binding IsChecked, ElementName=flowToggle, Converter={StaticResource boolToVisibility}, FallbackValue=Visible}"
                               Style="{StaticResource ScrollItemsControlStyle}"
-                              IsHitTestVisible="False"
                               Padding="0,1,0,0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Height="40" Background="Transparent" IsHitTestVisible="False">
+                            <Grid Height="40" Background="Transparent">
                                 <Rectangle Fill="#af000000" RadiusX="3" RadiusY="3" Margin="0,1" IsHitTestVisible="False"/>
-                                <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,1" IsHitTestVisible="False">
-                                    <TextBlock Padding="7,0" IsHitTestVisible="False">
+                                <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,1">
+                                    <TextBlock Padding="7,0">
                                         <Run Text="{Binding Tag, Mode=OneWay, StringFormat='{}{0}\: '}" Foreground="#a8def1"/>
-                                        <Run Text="{Binding Content, Mode=OneWay}" Foreground="White"/>
+                                        <Run MouseLeftButtonDown="copyToClipboard" Text="{Binding Content, Mode=OneWay}" Foreground="White"/>
                                     </TextBlock>
                                 </Viewbox>
                             </Grid>

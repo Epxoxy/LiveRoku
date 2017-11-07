@@ -277,7 +277,7 @@
                         PreviewMouseLeftButtonUp="onPreMouseLButtonUp" 
                         PreviewMouseRightButtonUp="onPreMouseRButtonUp"
                         PreviewMouseMove="onPreMouseMove" Style="{StaticResource RectangleButtonStyle}">
-                        <TextBlock x:Name="floatingBlock" Text="0000.00M" FontSize="14" Foreground="DarkSlateGray" TextAlignment="Center"/>
+                        <TextBlock x:Name="floatingBlock" Text="0000.00" FontSize="14" Foreground="DarkSlateGray" TextAlignment="Center"/>
                     </Button>
                 </theme:SystemDropShadowChrome>
                 <Grid x:Name="statusTips" Visibility="Collapsed" IsHitTestVisible="False" Margin="0,0,3,3">
