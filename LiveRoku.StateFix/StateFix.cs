@@ -115,7 +115,7 @@
                 idleTimer.Stop();
             }
 
-            public override void onLiveStatusUpdateByDanmaku(bool isOn) {
+            public override void onLiveStatusUpdate(bool isOn) {
                 if (isOn) downloadTest();
             }
             

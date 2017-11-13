@@ -298,7 +298,7 @@ namespace LiveRoku {
         }
 
         //--------------- IDanmakuResolver ------------------
-        public override void onLiveStatusUpdateByDanmaku(bool isOn) {
+        public override void onLiveStatusUpdate(bool isOn) {
             LiveStatusText = isOn ? Constant.LiveOnText : Constant.LiveOffText;
         }
 

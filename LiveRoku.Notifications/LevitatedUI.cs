@@ -89,7 +89,7 @@
             }
         }
 
-        public override void onLiveStatusUpdateByDanmaku(bool on) {
+        public override void onLiveStatusUpdate(bool on) {
             box.updateStatus (on);
             if (on) {
                 box.updateTips (TipsType.Normal, string.Empty);

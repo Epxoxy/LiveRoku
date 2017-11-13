@@ -137,7 +137,7 @@ namespace LiveRoku.Notifications {
         }
 
         public void updateStatus (bool isOn) {
-            invokeSafely(Dispatcher, () => this.statusEle.Text = isOn ? "ON" : "OFF");
+            invokeSafely(Dispatcher, () => this.statusBlock.Text = isOn ? "ON" : "OFF");
         }
 
         public void updateTips (TipsType level, string tips) {
@@ -150,7 +150,7 @@ namespace LiveRoku.Notifications {
         }
 
         public void updateSizeText (string text) {
-            invokeSafely(Dispatcher, () => { sizeTb.Text = text; });
+            invokeSafely(Dispatcher, () => { sizeBlock.Text = text; });
         }
 
         public void onClick (Action onClick) { }
