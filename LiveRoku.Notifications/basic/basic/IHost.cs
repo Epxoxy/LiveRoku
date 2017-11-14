@@ -7,6 +7,7 @@
         void updateTips (TipsType level, string tips);
         void updateSizeText (string text);
         void updateStatus (bool isOn);
+        void updateHot(string hotText);
         void onClick (System.Action onClick);
     }
 }

@@ -14,6 +14,19 @@
         Background="{x:Null}" 
         AllowsTransparency="True" Height="0" Width="0">
     <Window.Resources>
+        <Style x:Key="SymbolStyle" TargetType="Path">
+            <Setter Property="Height" Value="14" />
+            <Setter Property="Width" Value="14" />
+            <Setter Property="Stretch" Value="UniformToFill" />
+            <Setter Property="StrokeLineJoin" Value="Round" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="CacheMode">
+                <Setter.Value>
+                    <BitmapCache SnapsToDevicePixels="True"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <BooleanToVisibilityConverter x:Key="boolToVisibility"/>
 
 
@@ -169,12 +182,8 @@
     </Window.Resources>
     <Canvas>
         <Popup x:Name="popbox" IsHitTestVisible="False" Style="{StaticResource NormalPopupStyle}" Width="320">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="36"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Border CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick">
+            <DockPanel>
+                <Border x:Name="head" DockPanel.Dock="Top" Height="28" CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
@@ -191,14 +200,28 @@
                             </Viewbox>
                         </Button>
                         <StackPanel Orientation="Horizontal">
-                            <Button Margin="4,2,0,0" Padding="8" Height="24" Width="24" Style="{StaticResource NormalButtonStyle}" Click="showHideOwnerClick">
-                                <Viewbox>
+                            <Button Margin="4,2,0,0" Padding="0,0,0,4" Height="24" Width="24" Style="{StaticResource NormalButtonStyle}" Click="showHideOwnerClick">
+                                <!--<Viewbox>
                                     <Path Data="M0,0 L10,0 L10,10 L0,10z M0,5 L10,5" Stroke="White" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round"/>
-                                </Viewbox>
+                                </Viewbox>-->
+                                <Path x:Name="StatusSymbol" Stroke="LightGray" Stretch="UniformToFill" Data="M8,0 6,3 0,3 0,10 10,10 10,3 4,3 2,0 M3,5 3,8 M7,5 7,8" Style="{StaticResource SymbolStyle}" />
                             </Button>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock x:Name="statusBlock" Margin="6,0"  Text="OFF" Foreground="White" FontWeight="SemiBold"/>
-                                <TextBlock x:Name="sizeBlock" Text="0000.00" Margin="4,0" VerticalAlignment="Center" Foreground="LightGray" FontWeight="SemiBold" />
+                                <!--<TextBlock Visibility="Collapsed" x:Name="statusBlock" Margin="4,0,6,0" Text="OFF" Foreground="White" FontWeight="SemiBold"/>-->
+                                <TextBlock Text="H" Margin="6,0,3,0" Foreground="LightGray" FontWeight="SemiBold" Style="{StaticResource AlignCenter}"/>
+                                <Viewbox MaxWidth="32" Stretch="Fill" StretchDirection="DownOnly">
+                                    <TextBlock x:Name="hotBlock" Text="---" Foreground="White" FontWeight="SemiBold" />
+                                </Viewbox>
+                                <Path Stretch="UniformToFill" Margin="14,0,6,0" Data="M3,3 0,3 0,10 10,10 10,3 7,3 M5,0 5,8 M2,5 5,8 8,5" Stroke="White" Style="{StaticResource SymbolStyle}" />
+                                <TextBlock x:Name="sizeBlock" Text="----" Foreground="White" VerticalAlignment="Center" FontWeight="SemiBold" />
+                                <!--<Grid Visibility="Collapsed" x:Name="connection" Margin="6,0" Width="36" ClipToBounds="True">
+                                    <Border Padding="3" x:Name="disconnectedSym" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center" Background="PaleVioletRed">
+                                        <Path Data="M 0,0 L1,1 M 1,0 L 0,1 " Stroke="Black" Height="6" Width="6" Stretch="Fill"/>
+                                    </Border>
+                                    <Border Padding="3" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Green">
+                                        <Path Data="M0,4 L3,7 7,1" Stroke="White" Height="7" Width="7" Style="{StaticResource AlignCenter}"/>
+                                    </Border>
+                                </Grid>-->
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -228,7 +251,7 @@
                                 </ToggleButton.Style>
                             </ToggleButton>
                             <ToggleButton x:Name="flowToggle" Unchecked="disableFlowMessage" Checked="enableFlowMessage" IsChecked="True" Padding="0" Style="{StaticResource ToggleSwitchControlStyle}"/>
-                            <Button Style="{StaticResource NormalButtonStyle}" Padding="5,0" Click="clearFlowMessage">
+                            <Button Style="{StaticResource NormalButtonStyle}" Margin="0,0,3,0" Padding="5,0" Click="clearFlowMessage">
                                 <Border x:Name="statusFill" Background="#FF03A9F4" BorderBrush="White" CornerRadius="6" Height="18" Width="32">
                                     <Border.Resources>
                                         <Storyboard x:Key="statusToBlue">
@@ -254,66 +277,69 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <ItemsControl x:Name="flowItems" Grid.Row="1"
+                <Grid x:Name="extend" DockPanel.Dock="Bottom">
+                    <ItemsControl x:Name="flowItems"
+                              VerticalAlignment="Bottom"
                               VirtualizingPanel.ScrollUnit="Pixel"
                               VirtualizingPanel.CacheLength="0,60"
                               VirtualizingPanel.CacheLengthUnit="Page"
                               VirtualizingPanel.IsVirtualizing="True" 
                               ScrollViewer.CanContentScroll="True" 
                               VirtualizingStackPanel.VirtualizationMode="Recycling"
-                              MaxHeight="280" VerticalAlignment="Top"
+                              MaxHeight="280"
                               Visibility="{Binding IsChecked, ElementName=flowToggle, Converter={StaticResource boolToVisibility}, FallbackValue=Visible}"
                               Style="{StaticResource ScrollItemsControlStyle}"
                               Padding="0,1,0,0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Height="40" Background="Transparent">
-                                <Rectangle Fill="#af000000" RadiusX="3" RadiusY="3" Margin="0,1" IsHitTestVisible="False"/>
-                                <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,1">
-                                    <TextBlock Padding="7,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="40" Background="Transparent">
+                                    <Rectangle Fill="#af000000" RadiusX="3" RadiusY="3" Margin="0,1" IsHitTestVisible="False"/>
+                                    <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,1">
+                                        <TextBlock Padding="7,0">
                                         <Run Text="{Binding Tag, Mode=OneWay, StringFormat='{}{0}\: '}" Foreground="#a8def1"/>
                                         <Run MouseLeftButtonDown="copyToClipboard" Text="{Binding Content, Mode=OneWay}" Foreground="White"/>
-                                    </TextBlock>
-                                </Viewbox>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-                <ItemsControl x:Name="recentItems" Grid.Row="1"
+                                        </TextBlock>
+                                    </Viewbox>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                    <ItemsControl x:Name="recentItems"
+                              VerticalAlignment="Bottom"
                               VirtualizingPanel.ScrollUnit="Pixel"
                               VirtualizingPanel.IsVirtualizing="True" 
                               ScrollViewer.CanContentScroll="True" 
                               VirtualizingStackPanel.VirtualizationMode="Recycling"
                               Visibility="{Binding IsChecked, ElementName=recentToggle, Converter={StaticResource boolToVisibility}}"
                               MaxHeight="280" MinHeight="20" 
-                              VerticalAlignment="Top"
                               BorderThickness="1,0,1,1"
                               BorderBrush="LightGray"
                               Background="#FFF4F4F4"
                               Style="{StaticResource NormalScrollItemsControlStyle}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border BorderBrush="#ffe4e4e4" BorderThickness="0,0,0,1" SnapsToDevicePixels="True">
-                                <local:SelectableTextBlock Margin="7,0" Padding="0,6" TextWrapping="WrapWithOverflow">
-                                    <Run Text="{Binding Extra, Mode=OneWay, StringFormat='{}{0}&#x000a;'}" Foreground="DimGray"/>
-                                    <Run Text="{Binding Tag, Mode=OneWay, StringFormat='{}{0}\: '}" Foreground="#1a0dab"/>
-                                    <Run MouseLeftButtonDown="copyToClipboard" Text="{Binding Content, Mode=OneWay}"/>
-                                </local:SelectableTextBlock>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </Grid>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#ffe4e4e4" BorderThickness="0,0,0,1" SnapsToDevicePixels="True">
+                                    <local:SelectableTextBlock Margin="7,0" Padding="0,6" TextWrapping="WrapWithOverflow">
+                                        <Run Text="{Binding Extra, Mode=OneWay, StringFormat='{}{0}&#x000a;'}" Foreground="DimGray"/>
+                                        <Run Text="{Binding Tag, Mode=OneWay, StringFormat='{}{0}\: '}" Foreground="#1a0dab"/>
+                                        <Run MouseLeftButtonDown="copyToClipboard" Text="{Binding Content, Mode=OneWay}"/>
+                                    </local:SelectableTextBlock>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+           </DockPanel>
         </Popup>
     </Canvas>
 </Window>

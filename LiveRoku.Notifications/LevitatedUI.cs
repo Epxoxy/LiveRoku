@@ -98,14 +98,16 @@
             }
         }
 
-        public override void onHotUpdateByDanmaku(long popularity) { }
+        public override void onHotUpdateByDanmaku(long popularity) {
+            box.updateHot(toBaseKUnit(popularity));
+        }
 
         public override void onDownloadSizeUpdate (long totalSize, string sizeText) {
             box.updateSizeText (sizeText);
         }
         
         public override void onPreparing () {
-            box.updateSizeText ("0000.00");
+            box.updateSizeText ("----");
             box.updateTips (TipsType.Yellow, "Prepare");
             box.updateStatus (false);
         }
@@ -125,5 +127,10 @@
             box.updateStatus (false);
         }
 
+        private string toBaseKUnit(long v) {
+            if (v > 1000)
+                return string.Format("{0:N2}k", v / 1000d);
+            return v.ToString();
+        }
     }
 }

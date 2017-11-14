@@ -1,11 +1,14 @@
 ﻿namespace LiveRoku.Notifications {
     public class Constant {
-        public const string MessageFlowBoxKey = "msgflowbox";
-        public const string MessageFlowBoxExtraKey = "msgflowbox-extra";
+        //FlowBox
+        public const string FlowBoxKey = "msgflowbox";
+        public const string FlowBoxExtraKey = "msgflowbox-extra";
+        public const string FlowBoxModeKey = "msgflowbox-in-bottom";
+        public const string FlowBoxOpenKey = "msgFlowChecked";
+        public const string FlowBoxMaxRecentKey = "maxRecent";
+        //Floating
         public const string FloatingboxKey = "floatingbox";
-        public const string PopMsgKey = "popMsg";
-        public const string MsgFlowCheckedKey = "msgFlowChecked";
-        public const string MaxRecentKey = "maxRecent";
+        public const string FloatingPopMsgKey = "popMsg";
         public const string Expand = "Expand";
         public const string Collapsed = "Collapsed";
         public const string Blue = "Blue";

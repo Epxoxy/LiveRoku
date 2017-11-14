@@ -64,7 +64,7 @@ namespace LiveRoku.Notifications {
             boxSettings.relativeTo(SystemParameters.WorkArea);
             popMsgSettings.relativeTo(SystemParameters.WorkArea);
             settings.put(Constant.FloatingboxKey, boxSettings);
-            settings.put(Constant.PopMsgKey, popMsgSettings);
+            settings.put(Constant.FloatingPopMsgKey, popMsgSettings);
         }
 
         private WidgetSettings getNewerSettings (System.Windows.Controls.Primitives.Popup obj) {
@@ -89,7 +89,7 @@ namespace LiveRoku.Notifications {
             this.Hide ();
             if (settings != null) {
                 var boxSettings = settings.get(Constant.FloatingboxKey, new WidgetSettings());
-                var popMsgSettings = settings.get(Constant.PopMsgKey, new WidgetSettings());
+                var popMsgSettings = settings.get(Constant.FloatingPopMsgKey, new WidgetSettings());
                 boxSettings = WidgetSettings.match (boxSettings, SystemParameters.WorkArea);
                 popMsgSettings = WidgetSettings.match (popMsgSettings, SystemParameters.WorkArea);
                 System.Diagnostics.Debug.WriteLine ($"Loading location {boxSettings.XOffset},{boxSettings.YOffset}");
@@ -211,6 +211,10 @@ namespace LiveRoku.Notifications {
 
         public void close () {
             Dispatcher.Invoke(() => Close());
+        }
+
+        public void updateHot(string hotText) {
+            //TODO
         }
 
         #endregion

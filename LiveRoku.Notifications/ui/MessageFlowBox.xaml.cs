@@ -7,6 +7,7 @@ using System.Windows.Input;
 using LiveRoku.Notifications.helpers;
 using System.Windows.Threading;
 using System.Threading;
+using System.Windows.Media;
 
 namespace LiveRoku.Notifications {
     /// <summary>
@@ -29,9 +30,9 @@ namespace LiveRoku.Notifications {
             });
             var flowChecked = Dispatcher.Invoke(() => flowToggle.IsChecked == true);
             location.relativeTo(SystemParameters.WorkArea);
-            settings.put(Constant.MessageFlowBoxKey, location);
-            settings.put(Constant.MsgFlowCheckedKey, flowChecked);
-            settings.put(Constant.MaxRecentKey, msgHost.MaxRecentSize);
+            settings.put(Constant.FlowBoxKey, location);
+            settings.put(Constant.FlowBoxOpenKey, flowChecked);
+            settings.put(Constant.FlowBoxMaxRecentKey, msgHost.MaxRecentSize);
         }
 
         private void subscribeEvent(Base.ISettings settings) {
@@ -41,6 +42,9 @@ namespace LiveRoku.Notifications {
                 if (Owner != null) Owner.Closing += onOwnerClosing;
                 this.Top = 0;
                 this.Hide();
+                var mode = settings.get(Constant.FlowBoxModeKey, false);
+                toDisplayMode(mode);
+                settings.put(Constant.FlowBoxModeKey, mode);
                 setPopup(settings);
                 setFlow(settings);
             };
@@ -51,7 +55,7 @@ namespace LiveRoku.Notifications {
             popbox.Closed += reopenOnUnexpectedlyClosed;
             //get settings from storage
             //get extra from storage
-            var location = settings.get(Constant.MessageFlowBoxKey, new WidgetSettings());
+            var location = settings.get(Constant.FlowBoxKey, new WidgetSettings());
             location = WidgetSettings.match(location, SystemParameters.WorkArea);
             System.Diagnostics.Debug.WriteLine($"Loading location {location.XOffset},{location.YOffset}");
             //set popup
@@ -67,14 +71,14 @@ namespace LiveRoku.Notifications {
             recentItems.ItemsSource = recentMsgList;
             animator = new FlowAnimationWrapper (flowItems.GetVisualChild<ScrollViewer> (), msgFlowList);
             //set message host
-            var maxRecent = settings.get(Constant.MaxRecentKey, 60);
+            var maxRecent = settings.get(Constant.FlowBoxMaxRecentKey, 60);
             msgHost = new MessageWrapper<MessageBean> (msgFlowList, recentMsgList, msg => {
                 return new MessageBean (msg.Tag, msg.Content) { Extra = $"[{DateTime.Now.ToString("HH:mm:ss fff")}]" };
             }, Math.Max(maxRecent, 60));
             msgHost.onMessageAddedDo (() => animator.raiseAnimated ());
             //must set it after because of flowToggle control flowItems's visibility
             //which may case flowItems.GetVisualChild<T> return null
-            var enabled = settings.get(Constant.MsgFlowCheckedKey, true);
+            var enabled = settings.get(Constant.FlowBoxOpenKey, true);
             flowToggle.IsChecked = (bool)enabled;
             onFlowEnableChanged((bool)enabled);
         }
@@ -137,7 +141,12 @@ namespace LiveRoku.Notifications {
         }
 
         public void updateStatus (bool isOn) {
-            invokeSafely(Dispatcher, () => this.statusBlock.Text = isOn ? "ON" : "OFF");
+            invokeSafely(Dispatcher, () => this.StatusSymbol.Stroke = isOn ? Brushes.Orange : Brushes.LightGray);
+            //invokeSafely(Dispatcher, () => this.statusBlock.Text = isOn ? "ON" : "OFF");
+        }
+
+        public void updateHot(string hotText) {
+            invokeSafely(Dispatcher, () => hotBlock.Text = hotText);
         }
 
         public void updateTips (TipsType level, string tips) {
@@ -154,6 +163,23 @@ namespace LiveRoku.Notifications {
         }
 
         public void onClick (Action onClick) { }
+
+        //set layout
+        private void toDisplayMode(bool isHeadBottom) {
+            VerticalAlignment align = VerticalAlignment.Bottom;
+            if (isHeadBottom) {
+                DockPanel.SetDock(head, Dock.Bottom);
+                DockPanel.SetDock(extend, Dock.Top);
+                extend.Height = flowItems.MaxHeight;
+            } else {
+                DockPanel.SetDock(head, Dock.Top);
+                DockPanel.SetDock(extend, Dock.Bottom);
+                align = VerticalAlignment.Top;
+                extend.Height = Double.NaN;
+            }
+            flowItems.VerticalAlignment = align;
+            recentItems.VerticalAlignment = align;
+        }
 
         //event handlers start
         private void dragMoveClick (object sender, MouseButtonEventArgs e) {
