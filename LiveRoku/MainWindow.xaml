@@ -30,17 +30,20 @@
         <converters:BoolToVisibilityConverter x:Key="bool2collapsed" NotVisibleValue="Collapsed" InvertVisibility="True"/>
         <converters:BoolSelectorConverter x:Key="bool2column" TrueValue="0" FalseValue="1"/>
         <converters:BoolSelectorConverter x:Key="bool2columnspan" TrueValue="2" FalseValue="1"/>
-        <local:BootStatesToValueConverter x:Key="bootToActionText"
+        <converters:BoolSelectorConverter x:Key="boolToStatusText" 
+                                          TrueValue="{x:Static local:Constant.LiveOnText}" 
+                                          FalseValue="{x:Static local:Constant.LiveOffText}"/>
+        <local:ProcessStateToValueConverter x:Key="processToActionText"
                                           StoppedValue="{x:Static local:Constant.StartActionText}"
                                           PreparingValue="{x:Static local:Constant.PreparingActionText}"
                                           WaitingValue="{x:Static local:Constant.CancelWaitingActionText}" 
                                           StreamingValue="{x:Static local:Constant.StopActionText}"/>
-        <local:BootStatesToValueConverter x:Key="bootToStatusText"
+        <local:ProcessStateToValueConverter x:Key="processToStatusText"
                                           StoppedValue="{x:Static local:Constant.RecordStopText}"
                                           PreparingValue="{x:Static local:Constant.RecordPreparingText}"
                                           WaitingValue="{x:Static local:Constant.RecordWaitingText}" 
                                           StreamingValue="{x:Static local:Constant.RecordingText}"/>
-        <local:BootStatesToValueConverter x:Key="bootToSymbol"
+        <local:ProcessStateToValueConverter x:Key="processToSymbol"
                                           StoppedValue="{StaticResource {x:Static local:Constant.StopSymbolKey}}"
                                           PreparingValue="{StaticResource {x:Static local:Constant.StopSymbolKey}}"
                                           WaitingValue="{StaticResource {x:Static local:Constant.LoadingSymbolKey}}"
@@ -58,7 +61,7 @@
                             <Grid>
                                 <ItemsControl Padding="8" Focusable="False">
                                     <!-- PreferencesRoot -->
-                                    <ItemsControl IsEnabled="{Binding PreferencesEnabled}">
+                                    <ItemsControl IsEnabled="{Binding IsPreferencesEditable}">
                                         <ItemsControl.Style>
                                             <Style TargetType="FrameworkElement">
                                                 <Style.Triggers>
@@ -85,8 +88,8 @@
                                                     <ColumnDefinition />
                                                     <ColumnDefinition Width="auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <!--LocationFormat-->
-                                                <TextBlock Text="{Binding LocationFormat}"
+                                                <!--VideoFullPathFormat-->
+                                                <TextBlock Text="{Binding VideoFullPathFormat}"
                                                                Padding="7,0,4,0" TextTrimming="CharacterEllipsis"
                                                                ToolTipService.InitialShowDelay="0"
                                                                ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
@@ -106,7 +109,7 @@
                                             </Grid>
                                         </HeaderedContentControl>
                                         <!--DanmakuRequire-->
-                                        <CheckBox IsChecked="{Binding DanmakuRequire, FallbackValue='true'}" Margin="6" Style="{StaticResource AnimatedCheckBox}">
+                                        <CheckBox IsChecked="{Binding LocalDanmakuRequire, FallbackValue='true'}" Margin="6" Style="{StaticResource AnimatedCheckBox}">
                                             <TextBlock Text="save danmaku" Margin="10,0,0,0" Foreground="Gray"/>
                                         </CheckBox>
                                         <!--AutoStart-->
@@ -115,15 +118,15 @@
                                         </CheckBox>
                                         <!--Attach start button event-->
                                     </ItemsControl>
-                                    <Button x:Name="startEndBtn01" Content="{Binding BootStates, Converter={StaticResource bootToActionText}, FallbackValue='Start'}" 
-                                                IsEnabled="{Binding CmdEnabled}"
+                                    <Button x:Name="startEndBtn01" Content="{Binding CurrentState, Converter={StaticResource processToActionText}, FallbackValue='Start'}" 
+                                                IsEnabled="{Binding IsStateChangeable}"
                                                 Style="{StaticResource BlueButtonStyle}" Height="40" Margin="4,7" FontSize="18"/>
                                 </ItemsControl>
                             </Grid>
                         </Border>
                     </ContentControl>
                     <!--Status view-->
-                    <TextBlock Text="{Binding LiveStatusText, StringFormat='State -- [{0}]', TargetNullValue='State',FallbackValue='State'}" Foreground="DimGray" FontSize="16" Margin="2,7,0,3"/>
+                    <TextBlock Text="{Binding IsLiveOn, Converter={StaticResource boolToStatusText}, StringFormat='State -- [{0}]', TargetNullValue='State',FallbackValue='State'}" Foreground="DimGray" FontSize="16" Margin="2,7,0,3"/>
                     <ContentControl Margin="0,8" Template="{StaticResource ShadowControl}">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -137,7 +140,7 @@
                                     <Grid Margin="30,0,0,0">
                                         <Rectangle Fill="#ffe6cc" Height="48"/>
                                         <!--ImaStatusText-->
-                                        <Label Content="{Binding BootStates, Converter={StaticResource bootToStatusText}, FallbackValue='Stopped'}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Gray"/>
+                                        <Label Content="{Binding CurrentState, Converter={StaticResource processToStatusText}, FallbackValue='Stopped'}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Foreground="Gray"/>
                                         <ProgressBar x:Name="RecordStatusGroupBox" 
                                              BorderThickness="0"
                                              Height="1" VerticalAlignment="Top" IsIndeterminate="False"
@@ -246,7 +249,7 @@
                                             <TextBlock Style="{StaticResource ContentTb}" Text="NotImplemented"/>
                                             <!-- Title -->
                                             <TextBlock x:Name="titleView" Style="{StaticResource ContentTb}" Background="White" TextTrimming="CharacterEllipsis"
-                                                           Text="{Binding RoomInfo.Title, FallbackValue='--------'}"
+                                                           Text="{Binding CurrentRoomInfo.Title, FallbackValue='--------'}"
                                                            ToolTipService.InitialShowDelay="0" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
                                         </Grid>
                                     </HeaderedContentControl>
@@ -284,12 +287,12 @@
                                     </HeaderedContentControl>
                                 </ItemsControl>
                                 <Rectangle x:Name="exploreArea" Grid.Row="1" Fill="#ffe6cc" Height="48" Cursor="Hand" ToolTip="Click to open location"/>
-                                <TextBlock Grid.Row="1" Text="{Binding BootStates, Converter={StaticResource bootToStatusText}}" IsHitTestVisible="False"
+                                <TextBlock Grid.Row="1" Text="{Binding CurrentState, Converter={StaticResource processToStatusText}}" IsHitTestVisible="False"
                                                Style="{StaticResource AlignCenter}" FontSize="14" Foreground="Gray"/>
                                 <Button x:Name="startEndBtn02" Height="48" Width="48" Background="#3bcca1" Style="{StaticResource ShadowCircleBtnStyle02}" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                             Margin="10,24" Grid.RowSpan="2" Foreground="White" 
-                                            Content="{Binding BootStates, Converter={StaticResource bootToSymbol}}"
-                                            IsEnabled="{Binding CmdEnabled}">
+                                            Content="{Binding CurrentState, Converter={StaticResource processToSymbol}}"
+                                            IsEnabled="{Binding IsStateChangeable}">
                                 </Button>
                             </Grid>
                         </ContentControl>

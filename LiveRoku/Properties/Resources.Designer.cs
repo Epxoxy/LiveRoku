@@ -61,7 +61,7 @@ namespace LiveRoku.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This is a video record app of bilibili. But it is not the official production of bilibili, please use it without violating bilibili user agreement and you need to observe the live etiquette, also don&apos;t try to upload the live video without the permission of Up..
+        ///   Looks up a localized string similar to Unofficial production live record app of bilibili, please observe the live etiquette and use it without violating bilibili user agreement, also notice that you cannot upload the live video without the permission of anchor..
         /// </summary>
         public static string About {
             get {
@@ -70,24 +70,15 @@ namespace LiveRoku.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        public static string FileFormat {
-            get {
-                return ResourceManager.GetString("FileFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {roomid} -- Id of live room
         ///{Y} -- Year      {M} -- Month     {d} -- Day  
         ///{h} -- Hour    {m} -- minute     {s} -- second
-        ///We are not recommand you to use fix name which will cover by others.
-        ///You can user &apos;\&apos; in file name which will case a new subfolder create..
+        ///Not recommand using fix name for it will cover others.
+        ///Use &apos;\&apos; in format will case a new subfolder to be created..
         /// </summary>
-        public static string FileFormatExplain {
+        public static string FileNameFormatExplain {
             get {
-                return ResourceManager.GetString("FileFormatExplain", resourceCulture);
+                return ResourceManager.GetString("FileNameFormatExplain", resourceCulture);
             }
         }
     }

@@ -118,16 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>This is a video record app of bilibili. But it is not the official production of bilibili, please use it without violating bilibili user agreement and you need to observe the live etiquette, also don't try to upload the live video without the permission of Up.</value>
+    <value>Unofficial production live record app of bilibili, please observe the live etiquette and use it without violating bilibili user agreement, also notice that you cannot upload the live video without the permission of anchor.</value>
   </data>
-  <data name="FileFormat" xml:space="preserve">
-    <value />
-  </data>
-  <data name="FileFormatExplain" xml:space="preserve">
+  <data name="FileNameFormatExplain" xml:space="preserve">
     <value>{roomid} -- Id of live room
 {Y} -- Year      {M} -- Month     {d} -- Day  
 {h} -- Hour    {m} -- minute     {s} -- second
-We are not recommand you to use fix name which will cover by others.
-You can user '\' in file name which will case a new subfolder create.</value>
+Not recommand using fix name for it will cover others.
+Use '\' in format will case a new subfolder to be created.</value>
   </data>
 </root>

@@ -47,7 +47,7 @@
                 <TextBox x:Name="fileNameTBox" x:FieldModifier="private" Foreground="DarkSlateGray" Style="{StaticResource FixPlaceHolderTextBox}" controls:PlaceHolder.Content="Video file name" Padding="0,7"/>
             </StackPanel>
             <Rectangle Style="{StaticResource Line}"/>
-            <TextBlock Margin="10" Text="{x:Static props:Resources.FileFormatExplain}" FontSize="13" Foreground="DimGray" TextWrapping="Wrap"/>
+            <TextBlock Margin="10" Text="{x:Static props:Resources.FileNameFormatExplain}" FontSize="13" Foreground="DimGray" TextWrapping="Wrap"/>
         </ItemsControl>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
             <Button Content="SURE" FontSize="20" Width="100" Margin="10,0" Style="{StaticResource TransparentToGrayButtonStyle}" Click="okBtnClick"/>

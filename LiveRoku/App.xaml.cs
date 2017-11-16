@@ -14,14 +14,15 @@ namespace LiveRoku {
         //Basic path below
         private static readonly string debugFolder = AppDomain.CurrentDomain.BaseDirectory + "debug";
         private LogDateTimeTraceListener logTracker;
-        public static App instance;
+        
         public App () {
-            instance = this;
             logTracker = new LogDateTimeTraceListener (System.IO.Path.Combine(debugFolder, "debug.txt"));
             System.Diagnostics.Trace.Listeners.Add (logTracker);
             System.Diagnostics.Trace.AutoFlush = true;
             DispatcherUnhandledException += onDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += outputException;
+            System.Diagnostics.Debug.WriteLine("*******************", "app");
+            System.Diagnostics.Debug.WriteLine("*******************", "app");
         }
 
         #region Unexpected exception handler
@@ -90,17 +91,17 @@ namespace LiveRoku {
         }
 
         #endregion
-    }
 
-    internal class LogDateTimeTraceListener : System.Diagnostics.TextWriterTraceListener {
-        public LogDateTimeTraceListener (string path) : base (path) { }
+        internal class LogDateTimeTraceListener : System.Diagnostics.TextWriterTraceListener {
+            public LogDateTimeTraceListener(string path) : base(path) { }
 
-        public override void WriteLine (string message, string category) {
-            base.WriteLine (string.Format ("[{0:yyyy-MM-dd HH:mm:ss.fff}] [{1}]: {2}", DateTime.Now, category, message.Replace ("\n", Environment.NewLine)));
-        }
+            public override void WriteLine(string message, string category) {
+                base.WriteLine(string.Format("[{0:yyyy-MM-dd HH:mm:ss.fff}] [{1}]: {2}", DateTime.Now, category, message.Replace("\n", Environment.NewLine)));
+            }
 
-        public override void WriteLine (string message) {
-            base.WriteLine (string.Format ("[{0:yyyy-MM-dd HH:mm:ss.fff}] : {1}", DateTime.Now, message.Replace ("\n", Environment.NewLine)));
+            public override void WriteLine(string message) {
+                base.WriteLine(string.Format("[{0:yyyy-MM-dd HH:mm:ss.fff}] : {1}", DateTime.Now, message.Replace("\n", Environment.NewLine)));
+            }
         }
     }
 }

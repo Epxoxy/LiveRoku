@@ -69,7 +69,7 @@
             box = null;
         }
 
-        public void onLog(Level level, string message) {
+        public override void onLog(Level level, string message) {
             box.addMessage(level.ToString(), message);
         }
 
