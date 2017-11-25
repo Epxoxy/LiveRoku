@@ -14,243 +14,273 @@
         Background="{x:Null}" 
         AllowsTransparency="True" Height="0" Width="0">
     <Window.Resources>
-        <Style x:Key="SymbolStyle" TargetType="Path">
-            <Setter Property="Height" Value="14" />
-            <Setter Property="Width" Value="14" />
-            <Setter Property="Stretch" Value="UniformToFill" />
-            <Setter Property="StrokeLineJoin" Value="Round" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="CacheMode">
-                <Setter.Value>
-                    <BitmapCache SnapsToDevicePixels="True"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <BooleanToVisibilityConverter x:Key="boolToVisibility"/>
+        <ResourceDictionary>
+            <Style x:Key="SymbolStyle" TargetType="Path">
+                <Setter Property="Height" Value="14" />
+                <Setter Property="Width" Value="14" />
+                <Setter Property="Stretch" Value="UniformToFill" />
+                <Setter Property="StrokeLineJoin" Value="Round" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="CacheMode">
+                    <Setter.Value>
+                        <BitmapCache SnapsToDevicePixels="True"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="boolToVisibility"/>
 
 
-        <SolidColorBrush x:Key="f4Brush" Color="#f4f4f4" />
-        <Color x:Key="Status.Yellow.Color" A="255" R="255" G="138" B="101" />
-        <Color x:Key="Status.Blue.Color" A="223" R="3" G="169" B="244" />
-        <Style x:Key="NormalPopupStyle" TargetType="{x:Type Popup}">
-            <Setter Property="StaysOpen" Value="True"/>
-            <Setter Property="AllowsTransparency" Value="True" />
-        </Style>
-        <Style x:Key="AlignCenter" TargetType="{x:Type FrameworkElement}">
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style x:Key="ScrollItemsControlStyle" TargetType="{x:Type ItemsControl}">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ItemsControl}">
-                        <Border Background="{TemplateBinding Background}">
-                            <ScrollViewer VerticalScrollBarVisibility="Hidden">
-                                <ItemsPresenter>
-                                </ItemsPresenter>
-                            </ScrollViewer>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="NormalScrollItemsControlStyle" TargetType="{x:Type ItemsControl}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ItemsControl}">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                <ItemsPresenter>
-                                </ItemsPresenter>
-                            </ScrollViewer>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="NormalButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" 
+            <SolidColorBrush x:Key="f4Brush" Color="#f4f4f4" />
+            <Color x:Key="Status.Yellow.Color" A="255" R="255" G="138" B="101" />
+            <Color x:Key="Status.Blue.Color" A="223" R="3" G="169" B="244" />
+            <Style x:Key="NormalPopupStyle" TargetType="{x:Type Popup}">
+                <Setter Property="StaysOpen" Value="True"/>
+                <Setter Property="AllowsTransparency" Value="True" />
+            </Style>
+            <Style x:Key="AlignCenter" TargetType="{x:Type FrameworkElement}">
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="ScrollItemsControlStyle" TargetType="{x:Type ItemsControl}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ItemsControl}">
+                            <Border Background="{TemplateBinding Background}">
+                                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                                    <ItemsPresenter>
+                                    </ItemsPresenter>
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="NormalScrollItemsControlStyle" TargetType="{x:Type ItemsControl}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ItemsControl}">
+                            <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Stylus.IsFlicksEnabled="True" PanningMode="VerticalOnly">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="NormalButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" 
                                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Background="{TemplateBinding Background}">
-                            <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Cursor" Value="Hand" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Cursor" Value="Hand" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <!--#region ********* ToggleSwitch **********-->
+            <!--#region ********* ToggleSwitch **********-->
 
-        <Color x:Key="ToggleSwitch.Checked.InnderBorder.Background" A="255" R="137" G="175" B="237" />
-        <Color x:Key="ToggleSwitch.Checked.InnerEllipse.Fill" A="255" R="33" G="109" B="234" />
-        <Color x:Key="ToggleSwitch.Unchecked.InnderBorder.Background" A="255" R="120" G="120" B="120" />
-        <Color x:Key="ToggleSwitch.Unchecked.InnerEllipse.Fill" A="255" R="255" G="255" B="255" />
-        <SolidColorBrush x:Key="ToggleSwitch.InnderBorder.Background" Color="{StaticResource ToggleSwitch.Unchecked.InnderBorder.Background}" />
-        <SolidColorBrush x:Key="ToggleSwitch.InnerEllipse.Fill" Color="{StaticResource ToggleSwitch.Unchecked.InnerEllipse.Fill}" />
+            <Color x:Key="ToggleSwitch.Checked.InnderBorder.Background" A="255" R="137" G="175" B="237" />
+            <Color x:Key="ToggleSwitch.Checked.InnerEllipse.Fill" A="255" R="33" G="109" B="234" />
+            <Color x:Key="ToggleSwitch.Unchecked.InnderBorder.Background" A="255" R="120" G="120" B="120" />
+            <Color x:Key="ToggleSwitch.Unchecked.InnerEllipse.Fill" A="255" R="255" G="255" B="255" />
+            <SolidColorBrush x:Key="ToggleSwitch.InnderBorder.Background" Color="{StaticResource ToggleSwitch.Unchecked.InnderBorder.Background}" />
+            <SolidColorBrush x:Key="ToggleSwitch.InnerEllipse.Fill" Color="{StaticResource ToggleSwitch.Unchecked.InnerEllipse.Fill}" />
 
-        <Style x:Key="ToggleSwitchControlStyle" TargetType="{x:Type ToggleButton}">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="4" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-            <Setter Property="SnapsToDevicePixels" Value="True" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CheckStates">
-                                    <VisualState x:Name="Checked">
-                                        <Storyboard>
-                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
-                                                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="8">
-                                                    <EasingDoubleKeyFrame.EasingFunction>
-                                                        <CubicEase EasingMode="EaseOut" />
-                                                    </EasingDoubleKeyFrame.EasingFunction>
-                                                </EasingDoubleKeyFrame>
-                                            </DoubleAnimationUsingKeyFrames>
-                                            <ColorAnimation Duration="0:0:0.1" Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+            <Style x:Key="ToggleSwitchControlStyle" TargetType="{x:Type ToggleButton}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Padding" Value="4" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CheckStates">
+                                        <VisualState x:Name="Checked">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="8">
+                                                        <EasingDoubleKeyFrame.EasingFunction>
+                                                            <CubicEase EasingMode="EaseOut" />
+                                                        </EasingDoubleKeyFrame.EasingFunction>
+                                                    </EasingDoubleKeyFrame>
+                                                </DoubleAnimationUsingKeyFrames>
+                                                <ColorAnimation Duration="0:0:0.1" Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
                                             To="{StaticResource ToggleSwitch.Checked.InnerEllipse.Fill}"></ColorAnimation>
-                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="innerBorder"
+                                                <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="innerBorder"
                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
                                             To="{StaticResource ToggleSwitch.Checked.InnderBorder.Background}"></ColorAnimation>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Unchecked">
-                                        <Storyboard>
-                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
-                                                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="-8">
-                                                    <EasingDoubleKeyFrame.EasingFunction>
-                                                        <CubicEase EasingMode="EaseOut" />
-                                                    </EasingDoubleKeyFrame.EasingFunction>
-                                                </EasingDoubleKeyFrame>
-                                            </DoubleAnimationUsingKeyFrames>
-                                            <!--216DEA-->
-                                            <ColorAnimation Duration="0:0:0.1" Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" 
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Unchecked">
+                                            <Storyboard>
+                                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)">
+                                                    <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="-8">
+                                                        <EasingDoubleKeyFrame.EasingFunction>
+                                                            <CubicEase EasingMode="EaseOut" />
+                                                        </EasingDoubleKeyFrame.EasingFunction>
+                                                    </EasingDoubleKeyFrame>
+                                                </DoubleAnimationUsingKeyFrames>
+                                                <!--216DEA-->
+                                                <ColorAnimation Duration="0:0:0.1" Storyboard.TargetName="innerEllipse" Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)" 
                                             To="{StaticResource ToggleSwitch.Unchecked.InnerEllipse.Fill}"></ColorAnimation>
-                                            <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="innerBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
+                                                <ColorAnimation Duration="0:0:0.2" Storyboard.TargetName="innerBorder" Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" 
                                             To="{StaticResource ToggleSwitch.Unchecked.InnderBorder.Background}"></ColorAnimation>
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                            <Grid Margin="{TemplateBinding Padding}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="40"/>
-                                </Grid.ColumnDefinitions>
-                                <ContentPresenter x:Name="content" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Grid Margin="{TemplateBinding Padding}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter x:Name="content" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}" ContentSource="{TemplateBinding Content}"></ContentPresenter>
-                                <Border x:Name="innerBorder" SnapsToDevicePixels="True" UseLayoutRounding="True" Grid.Column="1" Margin="3,0,3,0" CornerRadius="8" Background="{StaticResource ToggleSwitch.InnderBorder.Background}" Height="16" Width="32" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                    <Ellipse x:Name="innerEllipse" Height="16" Width="16" Fill="{StaticResource ToggleSwitch.InnerEllipse.Fill}">
-                                        <Ellipse.RenderTransform>
-                                            <TranslateTransform X="-8" />
-                                        </Ellipse.RenderTransform>
-                                    </Ellipse>
-                                </Border>
-                            </Grid>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="Content" Value="{x:Null}">
-                                <Setter Property="Grid.Column" TargetName="innerBorder" Value="0" />
-                                <Setter Property="Grid.ColumnSpan" TargetName="innerBorder" Value="2" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
+                                    <Border x:Name="innerBorder" SnapsToDevicePixels="True" UseLayoutRounding="True" Grid.Column="1" Margin="3,0,3,0" CornerRadius="8" Background="{StaticResource ToggleSwitch.InnderBorder.Background}" Height="16" Width="32" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                        <Ellipse x:Name="innerEllipse" Height="16" Width="16" Fill="{StaticResource ToggleSwitch.InnerEllipse.Fill}">
+                                            <Ellipse.RenderTransform>
+                                                <TranslateTransform X="-8" />
+                                            </Ellipse.RenderTransform>
+                                        </Ellipse>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="Content" Value="{x:Null}">
+                                    <Setter Property="Grid.Column" TargetName="innerBorder" Value="0" />
+                                    <Setter Property="Grid.ColumnSpan" TargetName="innerBorder" Value="2" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
 
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <PathGeometry x:Key="tv-disable" Figures="M8,1 6,3 0,3 0,10 10,10 10,3 4,3 2,1 M3,5 7,8 M7,5 3,8"/>
+            <PathGeometry x:Key="tv-normal" Figures="M8,1 6,3 0,3 0,10 10,10 10,3 4,3 2,1 M3,5 3,8 M7,5 7,8"/>
+            <!--#endregion-->
+            
+            <Style x:Key="Line" TargetType="Rectangle">
+                <Setter Property="Stroke" Value="LightGray" />
+                <Setter Property="StrokeThickness" Value="0.7" />
+                <Setter Property="CacheMode">
+                    <Setter.Value>
+                        <BitmapCache SnapsToDevicePixels="True" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="TopBarToggleStyle" TargetType="ToggleButton">
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border Margin="{TemplateBinding Padding}" Background="Transparent">
+                                <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="Foreground" Value="LightGray" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="NormalToggleStyle" TargetType="ToggleButton">
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border Margin="{TemplateBinding Padding}" Background="Transparent">
+                                <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="DisableToSemiTransparentStyle" TargetType="FrameworkElement">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.6" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="RoundItemsControlStyle" TargetType="{x:Type ItemsControl}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ItemsControl}">
+                            <Border CornerRadius="2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
         <!--#endregion-->
     </Window.Resources>
     <Canvas>
-        <Popup x:Name="popbox" IsHitTestVisible="False" Style="{StaticResource NormalPopupStyle}" Width="320">
+        <Popup x:Name="popbox" FocusManager.IsFocusScope="false" Style="{StaticResource NormalPopupStyle}" Width="320">
             <DockPanel>
-                <Border x:Name="head" DockPanel.Dock="Top" Height="28" CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick">
+                <Border x:Name="head" DockPanel.Dock="Top" Height="30" CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
-                        <Button Visibility="Collapsed" Padding="6" Height="24" Width="24" Style="{StaticResource NormalButtonStyle}" Click="addClick">
-                            <Viewbox Stretch="Uniform">
-                                <Path Data="M0,5 L10,5 M5,0 L5,10" Stroke="White" StrokeThickness="1.5" StrokeLineJoin="Round"/>
-                            </Viewbox>
-                        </Button>
-                        <Button Visibility="Collapsed" Padding="6" Height="24" Width="24" Style="{StaticResource NormalButtonStyle}" Click="removeClick">
-                            <Viewbox Stretch="Uniform" Width="18">
-                                <Line X1="0" X2="10" Y1="1" Y2="1" Stroke="White" Height="2"/>
-                            </Viewbox>
-                        </Button>
                         <StackPanel Orientation="Horizontal">
-                            <Button Margin="4,2,0,0" Padding="0,0,0,4" Height="24" Width="24" Style="{StaticResource NormalButtonStyle}" Click="showHideOwnerClick">
-                                <!--<Viewbox>
-                                    <Path Data="M0,0 L10,0 L10,10 L0,10z M0,5 L10,5" Stroke="White" StrokeThickness="2" StrokeEndLineCap="Round" StrokeStartLineCap="Round"/>
-                                </Viewbox>-->
-                                <Path x:Name="StatusSymbol" Stroke="LightGray" Stretch="UniformToFill" Data="M8,0 6,3 0,3 0,10 10,10 10,3 4,3 2,0 M3,5 3,8 M7,5 7,8" Style="{StaticResource SymbolStyle}" />
-                            </Button>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <!--<TextBlock Visibility="Collapsed" x:Name="statusBlock" Margin="4,0,6,0" Text="OFF" Foreground="White" FontWeight="SemiBold"/>-->
-                                <TextBlock Text="H" Margin="6,0,3,0" Foreground="LightGray" FontWeight="SemiBold" Style="{StaticResource AlignCenter}"/>
-                                <Viewbox MaxWidth="32" Stretch="Fill" StretchDirection="DownOnly">
-                                    <TextBlock x:Name="hotBlock" Text="---" Foreground="White" FontWeight="SemiBold" />
+                            <DockPanel Margin="6,0,2,0">
+                                <ToggleButton x:Name="prefToggle" Padding="4,0" Click="showHideOwnerClick" Style="{StaticResource TopBarToggleStyle}">
+                                    <Path x:Name="tvSymbol" Width="15" Stroke="PaleVioletRed" Stretch="Fill" Data="{StaticResource tv-disable}" Style="{StaticResource SymbolStyle}" />
+                                </ToggleButton>
+                                <Viewbox MaxWidth="32" Margin="0,2,4,0" Stretch="Fill" StretchDirection="DownOnly">
+                                    <TextBlock x:Name="hotBlock" Text="---" Foreground="White" FontWeight="DemiBold" />
                                 </Viewbox>
-                                <Path Stretch="UniformToFill" Margin="14,0,6,0" Data="M3,3 0,3 0,10 10,10 10,3 7,3 M5,0 5,8 M2,5 5,8 8,5" Stroke="White" Style="{StaticResource SymbolStyle}" />
-                                <TextBlock x:Name="sizeBlock" Text="----" Foreground="White" VerticalAlignment="Center" FontWeight="SemiBold" />
-                                <!--<Grid Visibility="Collapsed" x:Name="connection" Margin="6,0" Width="36" ClipToBounds="True">
-                                    <Border Padding="3" x:Name="disconnectedSym" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center" Background="PaleVioletRed">
-                                        <Path Data="M 0,0 L1,1 M 1,0 L 0,1 " Stroke="Black" Height="6" Width="6" Stretch="Fill"/>
-                                    </Border>
-                                    <Border Padding="3" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Green">
-                                        <Path Data="M0,4 L3,7 7,1" Stroke="White" Height="7" Width="7" Style="{StaticResource AlignCenter}"/>
-                                    </Border>
-                                </Grid>-->
-                            </StackPanel>
+                            </DockPanel>
+                            <DockPanel Margin="4,0" x:Name="dloadPane">
+                                <ToggleButton x:Name="dloadIconToggle" Click="openAppOrStoreFolder" Padding="4,0" Style="{StaticResource TopBarToggleStyle}">
+                                    <Path Width="15" Stretch="Fill" Data="M0,3 0,10 10,10 10,3 M5,0 5,8 M2,5 5,8 8,5" Stroke="White" Style="{StaticResource SymbolStyle}" />
+                                </ToggleButton>
+                                <TextBlock x:Name="sizeBlock" Padding="0,2,4,0" Text="----" Foreground="White" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            </DockPanel>
+                            <!--<Grid x:Name="connection" Margin="0,0,7,0" ClipToBounds="True">
+                                <Border Padding="3" x:Name="disconnectedSym" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center" Background="PaleVioletRed">
+                                    <Path Data="M 0,0 L1,1 M 1,0 L 0,1 " Stroke="Black" Height="6" Width="6" Stretch="Fill"/>
+                                </Border>
+                                <Border Padding="3" CornerRadius="10" HorizontalAlignment="Left" VerticalAlignment="Center" Background="Green">
+                                    <Path Data="M0,4 L3,7 7,1" Stroke="White" Height="7" Width="7" Style="{StaticResource AlignCenter}"/>
+                                </Border>
+                            </Grid>-->
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <ToggleButton x:Name="recentToggle" Content="RECENT" Margin="3,0" Padding="4,0" FontWeight="SemiBold" Background="Transparent" BorderThickness="0">
-                                <ToggleButton.Style>
-                                    <Style TargetType="ToggleButton">
-                                        <Setter Property="VerticalContentAlignment" Value="Center" />
-                                        <Setter Property="Cursor" Value="Hand" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ToggleButton">
-                                                    <Border Margin="{TemplateBinding Padding}">
-                                                        <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsChecked" Value="True">
-                                                            <Setter Property="Foreground" Value="White" />
-                                                        </Trigger>
-                                                        <Trigger Property="IsChecked" Value="False">
-                                                            <Setter Property="Foreground" Value="LightGray" />
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ToggleButton.Style>
-                            </ToggleButton>
-                            <ToggleButton x:Name="flowToggle" Unchecked="disableFlowMessage" Checked="enableFlowMessage" IsChecked="True" Padding="0" Style="{StaticResource ToggleSwitchControlStyle}"/>
+                            <ToggleButton x:Name="recentToggle" Content="RECENT" Margin="3,0" Padding="4,0" FontWeight="SemiBold" Background="Transparent" BorderThickness="0" Style="{StaticResource TopBarToggleStyle}" />
+                            <ToggleButton x:Name="flowToggle" Unchecked="disableFlowMessage" Checked="enableFlowMessage" IsChecked="True" Padding="0" Style="{StaticResource ToggleSwitchControlStyle}" />
                             <Button Style="{StaticResource NormalButtonStyle}" Margin="0,0,3,0" Padding="5,0" Click="clearFlowMessage">
                                 <Border x:Name="statusFill" Background="#FF03A9F4" BorderBrush="White" CornerRadius="6" Height="18" Width="32">
                                     <Border.Resources>
@@ -279,7 +309,7 @@
                 </Border>
                 <Grid x:Name="extend" DockPanel.Dock="Bottom">
                     <ItemsControl x:Name="flowItems"
-                              VerticalAlignment="Bottom"
+                              VerticalAlignment="Top"
                               VirtualizingPanel.ScrollUnit="Pixel"
                               VirtualizingPanel.CacheLength="0,60"
                               VirtualizingPanel.CacheLengthUnit="Page"
@@ -296,8 +326,10 @@
                                     <Rectangle Fill="#af000000" RadiusX="3" RadiusY="3" Margin="0,1" IsHitTestVisible="False"/>
                                     <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,1">
                                         <TextBlock Padding="7,0">
-                                        <Run Text="{Binding Tag, Mode=OneWay, StringFormat='{}{0}\: '}" Foreground="#a8def1"/>
-                                        <Run MouseLeftButtonDown="copyToClipboard" Text="{Binding Content, Mode=OneWay}" Foreground="White"/>
+                                        <Run Text="{Binding Tag, Mode=OneTime, StringFormat='{}{0}\: '}" Foreground="#a8def1"/>
+                                        <Run MouseLeftButtonDown="copyTagToClipboard" Text="{Binding Content, Mode=OneTime}"
+                                             Tag="{Binding Content, Mode=OneTime}"
+                                             Foreground="White"/>
                                         </TextBlock>
                                     </Viewbox>
                                 </Grid>
@@ -310,24 +342,25 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
                     <ItemsControl x:Name="recentItems"
-                              VerticalAlignment="Bottom"
+                              VerticalAlignment="Top"
                               VirtualizingPanel.ScrollUnit="Pixel"
                               VirtualizingPanel.IsVirtualizing="True" 
                               ScrollViewer.CanContentScroll="True" 
                               VirtualizingStackPanel.VirtualizationMode="Recycling"
-                              Visibility="{Binding IsChecked, ElementName=recentToggle, Converter={StaticResource boolToVisibility}}"
                               MaxHeight="280" MinHeight="20" 
-                              BorderThickness="1,0,1,1"
+                              BorderThickness="1"
                               BorderBrush="LightGray"
                               Background="#FFF4F4F4"
+                              Visibility="{Binding IsChecked, ElementName=recentToggle, Converter={StaticResource boolToVisibility}}"
                               Style="{StaticResource NormalScrollItemsControlStyle}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border BorderBrush="#ffe4e4e4" BorderThickness="0,0,0,1" SnapsToDevicePixels="True">
                                     <local:SelectableTextBlock Margin="7,0" Padding="0,6" TextWrapping="WrapWithOverflow">
-                                        <Run Text="{Binding Extra, Mode=OneWay, StringFormat='{}{0}&#x000a;'}" Foreground="DimGray"/>
-                                        <Run Text="{Binding Tag, Mode=OneWay, StringFormat='{}{0}\: '}" Foreground="#1a0dab"/>
-                                        <Run MouseLeftButtonDown="copyToClipboard" Text="{Binding Content, Mode=OneWay}"/>
+                                        <Run MouseLeftButtonDown="copyTagToClipboard" Tag="{Binding Content, Mode=OneTime}" 
+                                             Text="{Binding Extra, Mode=OneTime, StringFormat='{}{0}&#x000a;'}" Foreground="DimGray"/>
+                                        <Run Text="{Binding Tag, Mode=OneTime, StringFormat='{}{0}\: '}" Foreground="#1a0dab"/>
+                                        <Run Text="{Binding Content, Mode=OneTime}"/>
                                     </local:SelectableTextBlock>
                                 </Border>
                             </DataTemplate>
@@ -339,7 +372,9 @@
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
                 </Grid>
-           </DockPanel>
+            </DockPanel>
         </Popup>
     </Canvas>
 </Window>
+
+                

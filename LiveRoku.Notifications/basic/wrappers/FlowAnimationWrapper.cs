@@ -75,9 +75,13 @@ namespace LiveRoku.Notifications {
         }
 
         private void isTimeToRemove(object sender, System.Timers.ElapsedEventArgs e) {
-            if (animating || src.Count <= 0)
-                return;
-            host.Dispatcher.Invoke(() => this.src.RemoveAt(0));
+            if (src.Count <= 0) {
+                lock (timer) {
+                    timer.Stop();
+                }
+            } else if(!animating) {
+                host.Dispatcher.Invoke(() => this.src.RemoveAt(0));
+            }
         }
 
         public void setIsEnabled (bool isEnabled) {

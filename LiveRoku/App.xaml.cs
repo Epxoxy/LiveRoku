@@ -21,8 +21,10 @@ namespace LiveRoku {
             System.Diagnostics.Trace.AutoFlush = true;
             DispatcherUnhandledException += onDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += outputException;
-            System.Diagnostics.Debug.WriteLine("*******************", "app");
-            System.Diagnostics.Debug.WriteLine("*******************", "app");
+            System.Diagnostics.Debug.WriteLine("--------------------------", "block");
+            System.Diagnostics.Debug.WriteLine("--------------------------", "block");
+            System.Diagnostics.Debug.WriteLine("---------  begin ---------", "block");
+            System.Diagnostics.Debug.WriteLine("--------------------------", "block");
         }
 
         #region Unexpected exception handler

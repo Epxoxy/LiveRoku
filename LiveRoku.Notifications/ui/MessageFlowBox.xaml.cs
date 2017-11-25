@@ -8,22 +8,28 @@ using LiveRoku.Notifications.helpers;
 using System.Windows.Threading;
 using System.Threading;
 using System.Windows.Media;
+using System.Collections.Generic;
+using System.Windows.Controls.Primitives;
 
 namespace LiveRoku.Notifications {
     /// <summary>
     /// Interaction logic for MessageFlowBox.xaml
     /// </summary>
     public partial class MessageFlowBox : Window, IFloatingHost {
+        public string EasyAccessFolder { get; set; }
         private FlowAnimationWrapper animator;
         private ScrollViewer recentHost;
         private MessageWrapper<MessageBean> msgHost;
+        private PathGeometry tvNormal;
+        private PathGeometry tvDisable;
+        //private List<ToggleButton> mutexToggle;
 
         public MessageFlowBox (Base.ISettings settings) {
             InitializeComponent ();
             subscribeEvent(settings);
         }
 
-        public void putSettingsTo (Base.ISettings settings) {
+        public void onStoringSettings (Base.ISettings settings) {
             if (settings == null) return;
             var location = Dispatcher.Invoke(() => {
                 return PopupHelper.getUpdatedLocation(popbox);
@@ -42,14 +48,32 @@ namespace LiveRoku.Notifications {
                 if (Owner != null) Owner.Closing += onOwnerClosing;
                 this.Top = 0;
                 this.Hide();
+                tvNormal = TryFindResource("tv-normal") as PathGeometry;
+                tvDisable = TryFindResource("tv-disable") as PathGeometry;
                 var mode = settings.get(Constant.FlowBoxModeKey, false);
                 toDisplayMode(mode);
                 settings.put(Constant.FlowBoxModeKey, mode);
                 setPopup(settings);
                 setFlow(settings);
+                /*mutexToggle = new List<ToggleButton>(new ToggleButton[] {
+                    dloadDetailToggle,
+                    recentToggle,
+                    prefToggle
+                });
+                foreach(var toggle in mutexToggle) {
+                    toggle.Checked += onWhoChecked;
+                }*/
             };
             this.Loaded += onLoaded;
         }
+
+        /*private void onWhoChecked(object sender, RoutedEventArgs e) {
+            foreach(var toggle in mutexToggle) {
+                if (toggle == sender)
+                    continue;
+                toggle.IsChecked = false;
+            }
+        }*/
 
         private void setPopup(Base.ISettings settings) {
             popbox.Closed += reopenOnUnexpectedlyClosed;
@@ -101,22 +125,7 @@ namespace LiveRoku.Notifications {
                 Owner.Closing -= onOwnerClosing;
             this.popbox.Closed -= reopenOnUnexpectedlyClosed;
         }
-
-        //TODO REMOVE IT
-        //test function,remove both from xaml
-        private int count = 0;
-        private void addClick (object sender, RoutedEventArgs e) {
-            addMessage ("Test", "am " + count++);
-        }
-
-        //TODO REMOVE IT
-        //test function,remove both from xaml
-        private void removeClick (object sender, RoutedEventArgs e) {
-            if (msgHost.FlowMsgs.Count > 0) {
-                msgHost.FlowMsgs.RemoveAt (0);
-            }
-        }
-
+        
         //interface part
         public void show () {
             invokeSafely(Dispatcher, () => Show());
@@ -140,9 +149,19 @@ namespace LiveRoku.Notifications {
             });
         }
 
-        public void updateStatus (bool isOn) {
-            invokeSafely(Dispatcher, () => this.StatusSymbol.Stroke = isOn ? Brushes.Orange : Brushes.LightGray);
-            //invokeSafely(Dispatcher, () => this.statusBlock.Text = isOn ? "ON" : "OFF");
+        public void updateLiveStatus (bool isOn) {
+            invokeSafely(Dispatcher, () => {
+                this.tvSymbol.Stroke = isOn ? Brushes.Orange : Brushes.LightGray;
+            });
+        }
+
+        public void updateIsRunning(bool isRunning) {
+            invokeSafely(Dispatcher, () => {
+                this.tvSymbol.Data = isRunning ? tvNormal : tvDisable;
+                if (!isRunning) {
+                    this.tvSymbol.Stroke = Brushes.PaleVioletRed;
+                }
+            });
         }
 
         public void updateHot(string hotText) {
@@ -162,7 +181,13 @@ namespace LiveRoku.Notifications {
             invokeSafely(Dispatcher, () => { sizeBlock.Text = text; });
         }
 
-        public void onClick (Action onClick) { }
+        public void danmakuOnlyModeSetTo(bool isDanmakuOnlyMode) {
+            invokeSafely(Dispatcher, () => {
+                dloadPane.Visibility = isDanmakuOnlyMode ? Visibility.Collapsed : Visibility.Visible;
+            });
+        }
+
+        public void setOnClick (Action onClick) { }
 
         //set layout
         private void toDisplayMode(bool isHeadBottom) {
@@ -224,13 +249,24 @@ namespace LiveRoku.Notifications {
             } else dispatcher.BeginInvoke (DispatcherPriority.Normal, action);
         }
 
-        private void copyToClipboard(object sender, MouseButtonEventArgs e) {
+        private void copyTagToClipboard(object sender, MouseButtonEventArgs e) {
             if(e.ClickCount >= 2) {
-                System.Windows.Documents.Run item = null;
-                if ((item = sender as System.Windows.Documents.Run) != null) {
-                    Clipboard.SetText(item.Text);
+                FrameworkContentElement item = null;
+                if ((item = sender as FrameworkContentElement) != null
+                    && item.Tag != null && item.Tag is string) {
+                    Clipboard.SetText((string)item.Tag);
                 }
             }
         }
+
+        private void openAppOrStoreFolder(object sender, RoutedEventArgs e) {
+            if (string.IsNullOrEmpty(EasyAccessFolder) || !System.IO.Directory.Exists(EasyAccessFolder)) {
+                EasyAccessFolder = AppDomain.CurrentDomain.BaseDirectory;
+            }
+            try {
+                System.Diagnostics.Process.Start(EasyAccessFolder);
+            } catch { }
+        }
+
     }
 }

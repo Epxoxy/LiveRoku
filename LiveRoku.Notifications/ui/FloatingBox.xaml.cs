@@ -13,6 +13,7 @@ namespace LiveRoku.Notifications {
     /// Interaction logic for FloatingBox.xaml
     /// </summary>
     public partial class FloatingBox : Window, IFloatingHost {
+        public string EasyAccessFolder { get; set; }
         public FloatingBox (Base.ISettings settings) {
             InitializeComponent ();
             timer = TimerWrapper.wrap (() => {
@@ -57,7 +58,7 @@ namespace LiveRoku.Notifications {
         private bool isMouseDown;
         #endregion
 
-        public void putSettingsTo (Base.ISettings settings) {
+        public void onStoringSettings (Base.ISettings settings) {
             if (settings == null) return;
             var boxSettings = Dispatcher.Invoke(() => PopupHelper.getUpdatedLocation (mybox));
             var popMsgSettings = Dispatcher.Invoke(() => getNewerSettings (popMsg));
@@ -152,7 +153,7 @@ namespace LiveRoku.Notifications {
 
         #region IFloating
 
-        public void onClick (Action action) {
+        public void setOnClick (Action action) {
             this.onFloatingBtnClick = action;
         }
 
@@ -188,7 +189,7 @@ namespace LiveRoku.Notifications {
             });
         }
 
-        public void updateStatus (bool isOn) {
+        public void updateLiveStatus (bool isOn) {
             Dispatcher.Invoke (() => floattingBox.BorderBrush = isOn ? Brushes.DeepSkyBlue : Brushes.Orange);
         }
 
@@ -215,6 +216,12 @@ namespace LiveRoku.Notifications {
 
         public void updateHot(string hotText) {
             //TODO
+        }
+
+        public void updateIsRunning(bool isRunning) {
+        }
+
+        public void danmakuOnlyModeSetTo(bool isDanmakuOnlyMode) {
         }
 
         #endregion

@@ -23,37 +23,44 @@
         [PluginSetting]
         public EasySettings Extra { get; private set; }
 
-        private ILiveFetcher fetcher;
+        private ILogger logger;
         private readonly MonitorImpl monitor = new MonitorImpl();
         private int idleDuration;
 
-        public void onAttach (IPluginHost host) {
-            this.fetcher = host.Fetcher;
-            this.fetcher.StatusBinders.add (this);
-            this.fetcher.LiveProgressBinders.add(this);
-        }
-
-        public void onInitialize (ISettings settings) {
-            Extra = Extra ?? new EasySettings();
+        public void onInitialize(ISettings appSettings) {
+            Extra = Extra ?? new EasySettings();//Get plugin settings
             idleDuration = Math.Max(Extra.get("idle-duration", (int)5000), 5000);
             Extra.put("idle-duration", idleDuration);
-            monitor.init(fetcher, idleDuration);
         }
 
-        public void onDetach (IPluginHost host) {
+        public void onAttach (IContext ctx) {
+            ctx.Fetcher.StatusBinders.add (this);
+            ctx.Fetcher.DownloadProgressBinders.add(this);
+            logger = ctx.Fetcher.Logger;
+        }
+
+        public void onDetach (IContext ctx) {
+            //Remove this
+            ctx.Fetcher.StatusBinders.remove(this);
+            ctx.Fetcher.DownloadProgressBinders.remove(this);
+            this.logger = null;
+            //Remove monitor
+            ctx.Fetcher.DownloadProgressBinders.remove(monitor);
+            ctx.Fetcher.DanmakuHandlers.remove(monitor);
+            ctx.Fetcher.StatusBinders.remove(monitor);
             monitor.cleanup();
         }
         
-        public override void onPreparing () {
-            var videoRequire = fetcher.Extra.get("video-require", true);
-            fetcher.LiveProgressBinders.remove(monitor);
-            fetcher.DanmakuHandlers.remove(monitor);
-            fetcher.StatusBinders.remove(monitor);
+        public override void onPreparing (IContext ctx) {
+            var videoRequire = ctx.Fetcher.RuntimeExtra.get("video-require", true);
+            ctx.Fetcher.DownloadProgressBinders.remove(monitor);
+            ctx.Fetcher.DanmakuHandlers.remove(monitor);
+            ctx.Fetcher.StatusBinders.remove(monitor);
             if (videoRequire) {
-                monitor.init(fetcher, idleDuration);
-                fetcher.LiveProgressBinders.add(monitor);
-                fetcher.DanmakuHandlers.add(monitor);
-                fetcher.StatusBinders.add(monitor);
+                monitor.init(ctx.Fetcher, idleDuration);
+                ctx.Fetcher.DownloadProgressBinders.add(monitor);
+                ctx.Fetcher.DanmakuHandlers.add(monitor);
+                ctx.Fetcher.StatusBinders.add(monitor);
             } else {
                 monitor.cleanup();
             }
@@ -78,11 +85,11 @@
                         file.Delete();
                     }
                 }catch(Exception e) {
-                    fetcher.Logger.log(Level.Error, e.Message);
+                    logger?.log(Level.Error, e.Message);
                 }
             }
         }
-
+        
         class MonitorImpl : LiveResolverBase{
             private DateTime newestRecvTime;
             private CancellationTokenSource downloadTestCTS;
@@ -125,19 +132,19 @@
                     idleTimer.Start();
             }
             
-            public override void onWaiting() {
+            public override void onWaiting(IContext ctx) {
                 idleTimer.Stop();
                 downloadTest();
             }
 
-            public override void onStreaming() {
+            public override void onStreaming(IContext ctx) {
                 newestRecvTime = DateTime.Now;
                 idleTimer.Stop();
                 downloadTest();
                 idleTimer.Start();
             }
 
-            public override void onStopped() {
+            public override void onStopped(IContext ctx) {
                 idleTimer.Stop();
                 cancel(downloadTestCTS);
                 cancel(idleTestCTS);

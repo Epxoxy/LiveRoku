@@ -1,0 +1,143 @@
+<!--<Button Visibility="Collapsed" Padding="6" Height="24" Width="24" Style="{StaticResource NormalButtonStyle}" Click="addClick">
+    <Viewbox Stretch="Uniform">
+        <Path Data="M0,5 L10,5 M5,0 L5,10" Stroke="White" StrokeThickness="1.5" StrokeLineJoin="Round"/>
+    </Viewbox>
+</Button>
+<Button Visibility="Collapsed" Padding="6" Height="24" Width="24" Style="{StaticResource NormalButtonStyle}" Click="removeClick">
+    <Viewbox Stretch="Uniform" Width="18">
+        <Line X1="0" X2="10" Y1="1" Y2="1" Stroke="White" Height="2"/>
+    </Viewbox>
+</Button>-->
+
+<!--<ItemsControl x:Name="prefPane" BorderBrush="LightGray" Background="White"
+                                  Padding="0" BorderThickness="1"
+                                  VerticalAlignment="Top"
+                                  Style="{StaticResource RoundItemsControlStyle}"
+                                  Visibility="{Binding IsChecked, ElementName=prefToggle, Converter={StaticResource boolToVisibility}}">
+    --><!-- PreferencesRoot --><!--
+    <ItemsControl IsEnabled="{Binding IsPreferencesEditable}" Style="{StaticResource DisableToSemiTransparentStyle}">
+        <HeaderedContentControl Margin="0" Padding="10,10" Style="{StaticResource UnderLineInput}">
+            <HeaderedContentControl.Header>
+                <TextBlock FontSize="16" Margin="0,0,0,0" Text="RoomId" FontFamily="Consolas"/>
+            </HeaderedContentControl.Header>
+            --><!--ShortRoomId--><!--
+            <TextBox Text="{Binding ShortRoomId}" Padding="7,0,4,0" controls:PlaceHolder.Content="http://live.bilibili.com/{number}" Style="{StaticResource FixPlaceHolderTextBox}" />
+        </HeaderedContentControl>
+        <HeaderedContentControl Margin="0" Padding="10,10" Style="{StaticResource UnderLineInput}">
+            <HeaderedContentControl.Header>
+                --><!--Attach save path label mouseleftdown event--><!--
+                <TextBlock x:Name="savepathTextLabel" Text="Location" FontSize="16" FontFamily="Consolas" Cursor="Hand"/>
+            </HeaderedContentControl.Header>
+            <DockPanel>
+                --><!--Attach open save path configu button click event--><!--
+                <Button x:Name="modifyLoationBtn" DockPanel.Dock="Right" Grid.Column="1" Cursor="Hand" Template="{StaticResource BtnLiteTemplate}">
+                    <Grid Margin="2,0" Background="Transparent">
+                        <Path Data="M100,45 L100,85 A6,6 0 0 1 95,90 L5,90 A5,5 0 0 1 0,85 L0,5 A5,5 0 0 1 5,0 L55,0 M104,-4 L45,55" StrokeThickness="2" 
+                                                  Stroke="#3399ff" Stretch="Fill" 
+                                                  StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round"
+                                                  ClipToBounds="True" Height="15" Width="15">
+                            <Path.CacheMode>
+                                <BitmapCache SnapsToDevicePixels="True" />
+                            </Path.CacheMode>
+                        </Path>
+                    </Grid>
+                </Button>
+                --><!--VideoFullPathFormat--><!--
+                <TextBlock DockPanel.Dock="Left" Text="{Binding VideoFullPathFormat}"
+                                                   Padding="7,0,4,0" TextTrimming="CharacterEllipsis"
+                                                   ToolTipService.InitialShowDelay="0"
+                                                   ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+            </DockPanel>
+        </HeaderedContentControl>
+        --><!--DanmakuRequire--><!--
+        <CheckBox Margin="7,13,7,0" Cursor="Hand" IsChecked="{Binding LocalDanmakuRequire, FallbackValue='true'}" Style="{StaticResource AnimatedCheckBox}">
+            <TextBlock Text="save danmaku of text to local file." Margin="10,0,0,0" Foreground="Gray"/>
+        </CheckBox>
+        --><!--AutoStart--><!--
+        <CheckBox Margin="7,13" Cursor="Hand" IsChecked="{Binding AutoStart, FallbackValue='true'}" Style="{StaticResource AnimatedCheckBox}">
+            <TextBlock Text="auto start download when live status updated." Margin="10,0,0,0" Foreground="Gray"/>
+        </CheckBox>
+        --><!--Attach start button event--><!--
+    </ItemsControl>
+    <Button x:Name="startEndBtn01" Content="Something" IsEnabled="{Binding IsStateChangeable}"
+                                Margin="-1,0" Height="40" FontSize="18" Style="{StaticResource BlueButtonStyle}"/>
+</ItemsControl>
+<ItemsControl x:Name="detailPane" BorderBrush="LightGray" Background="White"
+                                  Padding="0"  BorderThickness="1"
+                                  VerticalAlignment="Top" 
+                                  Style="{StaticResource RoundItemsControlStyle}"
+                                  Visibility="{Binding IsChecked, ElementName=dloadDetailToggle, Converter={StaticResource boolToVisibility}}">
+    <ItemsControl.Resources>
+        <Style x:Key="Header" TargetType="FrameworkElement">
+            <Setter Property="TextBlock.FontSize" Value="16" />
+            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+            <Setter Property="Margin" Value="2,4" />
+            <Setter Property="Width" Value="90" />
+            <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
+        </Style>
+        <Style x:Key="Content" TargetType="Label">
+            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="Margin" Value="12,0,0,0" />
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="ContentTb" TargetType="TextBlock">
+            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="Margin" Value="13,0,0,0" />
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="HeaderedContentControl">
+            <Setter Property="Template" Value="{StaticResource HorizontalArrange}" />
+            <Setter Property="Margin" Value="10,4" />
+            <Setter Property="IsTabStop" Value="False" />
+        </Style>
+    </ItemsControl.Resources>
+    <HeaderedContentControl >
+        <HeaderedContentControl.Header>
+            <DockPanel Style="{StaticResource Header}">
+                <ToggleButton x:Name="subToggle" IsChecked="True" Width="auto" Content="Subject" FontSize="16" Margin="0" ToolTip="Show/Hide subject" 
+                                                      Style="{StaticResource NormalToggleStyle}" />
+                <Button DockPanel.Dock="Right" Padding="4" Margin="2,3,2,0" Click="updateTitleClick"
+                                                ToolTip="Fetch subject" VerticalAlignment="Bottom" SnapsToDevicePixels="True">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource TransparentToGrayButtonStyle}">
+                            <Setter Property="Cursor" Value="Hand" />
+                        </Style>
+                    </Button.Style>
+                    <Path Data="M10,20 20,10 30,20 M20,35 20,10 M30,25 40,35 50,25 M40,10 40,30" Stroke="Black" StrokeThickness="1" Stretch="Fill" Height="12" Width="15">
+                        <Path.CacheMode>
+                            <BitmapCache SnapsToDevicePixels="True" EnableClearType="True"/>
+                        </Path.CacheMode>
+                    </Path>
+                </Button>
+            </DockPanel>
+        </HeaderedContentControl.Header>
+        <Grid>
+            <TextBlock Style="{StaticResource ContentTb}" Text="NotImplemented" Background="White"/>
+            --><!-- Title --><!--
+            <TextBlock Style="{StaticResource ContentTb}" Background="White" TextTrimming="CharacterEllipsis"
+                                               Visibility="{Binding IsChecked, ElementName=subToggle, Converter={StaticResource boolToVisibility}}"            
+                                               Text="{Binding CurrentRoomInfo.Title, FallbackValue='--------'}"
+                                                           ToolTipService.InitialShowDelay="0" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" />
+        </Grid>
+    </HeaderedContentControl>
+    <Rectangle Style="{StaticResource Line}" />
+    <HeaderedContentControl >
+        <HeaderedContentControl.Header>
+            <TextBlock Text="Time" Style="{StaticResource Header}"/>
+        </HeaderedContentControl.Header>
+        --><!-- RecordTime --><!--
+        <TextBlock Text="{Binding Duration, TargetNullValue='00:00:00',FallbackValue='00:00:00'}" Style="{StaticResource ContentTb}"/>
+    </HeaderedContentControl>
+    <Rectangle Style="{StaticResource Line}" />
+    <HeaderedContentControl >
+        <HeaderedContentControl.Header>
+            <TextBlock Text="Bit rate" Style="{StaticResource Header}"/>
+        </HeaderedContentControl.Header>
+        --><!-- BitRate --><!--
+        <TextBlock Text="{Binding BitRate, TargetNullValue='0000.00 kbps', FallbackValue='0000.00 kbps'}" Style="{StaticResource ContentTb}"/>
+    </HeaderedContentControl>
+</ItemsControl>-->
