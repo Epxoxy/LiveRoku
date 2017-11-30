@@ -169,12 +169,7 @@ namespace LiveRoku.Notifications {
         }
 
         public void updateTips (TipsType level, string tips) {
-            invokeSafely(Dispatcher, () => {
-                //Get next state
-                string stateName = Constant.getText (level);
-                if (string.IsNullOrEmpty (stateName)) return;
-                VisualStateManager.GoToElementState (statusFill, stateName, true);
-            });
+            //Empty implement
         }
 
         public void updateSizeText (string text) {

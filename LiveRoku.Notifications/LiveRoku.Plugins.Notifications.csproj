@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="basic\basic\MessageBean.cs" />
+    <Compile Include="ui\BoolSelector.cs" />
     <Compile Include="ui\SelectableTextBlock.cs" />
     <Compile Include="basic\wrappers\FlowAnimationWrapper.cs" />
     <Compile Include="api\PopupHelper.cs" />

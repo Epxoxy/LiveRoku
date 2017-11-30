@@ -177,8 +177,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <PathGeometry x:Key="tv-disable" Figures="M8,1 6,3 0,3 0,10 10,10 10,3 4,3 2,1 M3,5 7,8 M7,5 3,8"/>
-            <PathGeometry x:Key="tv-normal" Figures="M8,1 6,3 0,3 0,10 10,10 10,3 4,3 2,1 M3,5 3,8 M7,5 7,8"/>
             <!--#endregion-->
             
             <Style x:Key="Line" TargetType="Rectangle">
@@ -193,10 +191,16 @@
             <Style x:Key="TopBarToggleStyle" TargetType="ToggleButton">
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="CacheMode">
+                    <Setter.Value>
+                        <BitmapCache SnapsToDevicePixels="True"/>
+                    </Setter.Value>
+                </Setter>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ToggleButton">
-                            <Border Margin="{TemplateBinding Padding}" Background="Transparent">
+                            <Border Margin="{TemplateBinding Padding}" Background="Transparent" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
                                 <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
                             </Border>
                             <ControlTemplate.Triggers>
@@ -242,6 +246,21 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            
+            <!--#region icon-->
+            <PathGeometry x:Key="tv-disable" Figures="M8,1 6,3 0,3 0,10 10,10 10,3 4,3 2,1 M3,5 7,8 M7,5 3,8"/>
+            <PathGeometry x:Key="tv-normal" Figures="M8,1 6,3 0,3 0,10 10,10 10,3 4,3 2,1 M3,5 3,8 M7,5 7,8"/>
+            <PathGeometry x:Key="to-expand" Figures="M0,2 5,7 10,2"/>
+            <PathGeometry x:Key="to-collpased" Figures="M0,7 5,2 10,7"/>
+            <local:BoolSelector x:Key="toExpandOrHideIcon">
+                <local:BoolSelector.TrueValue>
+                    <PathGeometry Figures="M0,7 5,2 10,7"/>
+                </local:BoolSelector.TrueValue>
+                <local:BoolSelector.FalseValue>
+                    <PathGeometry Figures="M0,2 5,7 10,2"/>
+                </local:BoolSelector.FalseValue>
+            </local:BoolSelector>
+            <!--#endregion-->
         </ResourceDictionary>
         <!--#endregion-->
     </Window.Resources>
@@ -249,13 +268,13 @@
         <Popup x:Name="popbox" FocusManager.IsFocusScope="false" Style="{StaticResource NormalPopupStyle}" Width="320">
             <DockPanel>
                 <Border x:Name="head" DockPanel.Dock="Top" Height="30" CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick">
-                    <Grid>
+                    <Grid Margin="4,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <DockPanel Margin="6,0,2,0">
+                            <DockPanel Margin="2,0">
                                 <ToggleButton x:Name="prefToggle" Padding="4,0" Click="showHideOwnerClick" Style="{StaticResource TopBarToggleStyle}">
                                     <Path x:Name="tvSymbol" Width="15" Stroke="PaleVioletRed" Stretch="Fill" Data="{StaticResource tv-disable}" Style="{StaticResource SymbolStyle}" />
                                 </ToggleButton>
@@ -279,31 +298,22 @@
                             </Grid>-->
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <ToggleButton x:Name="recentToggle" Content="RECENT" Margin="3,0" Padding="4,0" FontWeight="SemiBold" Background="Transparent" BorderThickness="0" Style="{StaticResource TopBarToggleStyle}" />
-                            <ToggleButton x:Name="flowToggle" Unchecked="disableFlowMessage" Checked="enableFlowMessage" IsChecked="True" Padding="0" Style="{StaticResource ToggleSwitchControlStyle}" />
-                            <Button Style="{StaticResource NormalButtonStyle}" Margin="0,0,3,0" Padding="5,0" Click="clearFlowMessage">
-                                <Border x:Name="statusFill" Background="#FF03A9F4" BorderBrush="White" CornerRadius="6" Height="18" Width="32">
-                                    <Border.Resources>
-                                        <Storyboard x:Key="statusToBlue">
-                                            <ColorAnimation Storyboard.TargetName="statusFill" Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)" To="{StaticResource Status.Blue.Color}" Duration="00:00:00"/>
-                                        </Storyboard>
-                                        <Storyboard x:Key="statusToYello">
-                                            <ColorAnimation Storyboard.TargetName="statusFill" Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)" To="{StaticResource Status.Yellow.Color}" Duration="00:00:00" />
-                                        </Storyboard>
-                                    </Border.Resources>
-                                    <VisualStateManager.VisualStateGroups>
-                                        <VisualStateGroup>
-                                            <VisualState x:Name="Blue" Storyboard="{StaticResource statusToBlue}" />
-                                            <VisualState x:Name="Yellow" Storyboard="{StaticResource statusToYello}"/>
-                                            <VisualState x:Name="Normal" Storyboard="{StaticResource statusToBlue}" />
-                                        </VisualStateGroup>
-                                    </VisualStateManager.VisualStateGroups>
-                                    <Viewbox Stretch="Uniform" >
-                                        <Label Content="{Binding Items.Count, ElementName=flowItems}" x:Name="countLb" Foreground="White" FontWeight="SemiBold" FontSize="29" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        </Label>
-                                    </Viewbox>
-                                </Border>
-                            </Button>
+                            <DockPanel Margin="2,0,5,0">
+                                <ToggleButton Padding="6,0" Click="clearFlowMessage" Style="{StaticResource TopBarToggleStyle}">
+                                    <Rectangle Fill="#9E5E72" Height="7" Width="7" RadiusX="2" RadiusY="2"/>
+                                </ToggleButton>
+                                <Viewbox MaxWidth="32" Stretch="Uniform" StretchDirection="DownOnly" Margin="0,0,4,0">
+                                    <Label Content="{Binding Items.Count, ElementName=flowItems}" x:Name="countLb" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" Padding="0"/>
+                                </Viewbox>
+                            </DockPanel>
+                            <ToggleButton x:Name="recentToggle" Content="RECENT" Padding="4,0" FontWeight="SemiBold" Background="Transparent" BorderThickness="0" Style="{StaticResource TopBarToggleStyle}" />
+                            <ToggleButton x:Name="flowToggle" Margin="2,0" IsChecked="True" Padding="4,0" Style="{StaticResource TopBarToggleStyle}"
+                                          Unchecked="disableFlowMessage" Checked="enableFlowMessage">
+                                <Path Width="15" Stroke="PaleVioletRed" StrokeThickness="2" Stretch="Uniform" Style="{StaticResource SymbolStyle}"
+                                      Data="{Binding IsChecked, ElementName=flowToggle, Converter={StaticResource toExpandOrHideIcon}}"/>
+                            </ToggleButton>
+                            <!--<ToggleButton Visibility="Collapsed" IsChecked="True" Padding="0" Style="{StaticResource ToggleSwitchControlStyle}" />-->
+                           
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -374,6 +384,27 @@
                 </Grid>
             </DockPanel>
         </Popup>
+        <!--TODO Add support to mini mode-->
+        <!--<Popup x:Name="miniPopbox" FocusManager.IsFocusScope="false" Style="{StaticResource NormalPopupStyle}">
+            <Border Height="30" CornerRadius="3" Background="#434342" MouseLeftButtonDown="dragMoveClick" Padding="4,0">
+                <StackPanel Orientation="Horizontal">
+                    <DockPanel Margin="2,0">
+                        <ToggleButton Padding="4,0" Click="showHideOwnerClick" Style="{StaticResource TopBarToggleStyle}">
+                            <Path Width="15" Stroke="PaleVioletRed" Stretch="Fill" Data="{Binding Data, ElementName=tvSymbol}" Style="{StaticResource SymbolStyle}" />
+                        </ToggleButton>
+                        <Viewbox MaxWidth="32" Margin="0,2,4,0" Stretch="Fill" StretchDirection="DownOnly">
+                            <TextBlock Text="{Binding Text, ElementName=hotBlock}" Foreground="White" FontWeight="DemiBold" />
+                        </Viewbox>
+                    </DockPanel>
+                    <DockPanel Margin="4,0" Visibility="{Binding Visibility, ElementName=dloadPane}">
+                        <ToggleButton Click="openAppOrStoreFolder" Padding="4,0" Style="{StaticResource TopBarToggleStyle}">
+                            <Path Width="15" Stretch="Fill" Data="M0,3 0,10 10,10 10,3 M5,0 5,8 M2,5 5,8 8,5" Stroke="White" Style="{StaticResource SymbolStyle}" />
+                        </ToggleButton>
+                        <TextBlock Padding="0,2,4,0" Text="{Binding Text, ElementName=sizeBlock}" Foreground="White" VerticalAlignment="Center" FontWeight="SemiBold" />
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+        </Popup>-->
     </Canvas>
 </Window>
 
